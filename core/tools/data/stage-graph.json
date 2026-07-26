@@ -1,0 +1,1322 @@
+{
+  "versao": "1",
+  "compilado_em": "2026-07-26T11:58:12Z",
+  "estagios": [
+    {
+      "slug": "deteccao-projeto",
+      "nome": "Detecção de Projeto",
+      "fase": "inicializacao",
+      "ordem": "0.1",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — nada pode ser decidido antes de saber se há manuscrito no disco.",
+      "agente_lider": "escritor-compositor-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "exige_manuscrito": false,
+      "produz": [
+        "retrato-do-projeto"
+      ],
+      "consome": [],
+      "requer_estagio": [],
+      "escopos": [],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "entradas": "A intenção crua do autor e o conteúdo da pasta alvo",
+      "saidas": "retrato-do-projeto.md — o que já existe, o que falta, e se é obra nova ou retomada",
+      "arquivo": "core/escritor-common/stages/inicializacao/deteccao-projeto.md"
+    },
+    {
+      "slug": "scaffold-vault",
+      "nome": "Scaffold do Vault",
+      "fase": "inicializacao",
+      "ordem": "0.2",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — a obra precisa de casa antes do primeiro artefato.",
+      "agente_lider": "escritor-compositor-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "exige_manuscrito": false,
+      "produz": [
+        "mapa-do-vault"
+      ],
+      "consome": [
+        {
+          "artefato": "retrato-do-projeto",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "deteccao-projeto"
+      ],
+      "escopos": [],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "entradas": "retrato-do-projeto e o molde `_Template Livro`",
+      "saidas": "mapa-do-vault.md — onde cada coisa vive nesta obra",
+      "arquivo": "core/escritor-common/stages/inicializacao/scaffold-vault.md"
+    },
+    {
+      "slug": "init-estado",
+      "nome": "Inicialização de Estado",
+      "fase": "inicializacao",
+      "ordem": "0.3",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — sem estado o motor não sabe onde está.",
+      "agente_lider": "escritor-compositor-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "exige_manuscrito": false,
+      "produz": [
+        "plano-de-fluxo"
+      ],
+      "consome": [
+        {
+          "artefato": "retrato-do-projeto",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "mapa-do-vault",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "scaffold-vault"
+      ],
+      "escopos": [],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "retrato-do-projeto e mapa-do-vault",
+      "saidas": "plano-de-fluxo.md — os estágios que vão rodar, na ordem, com o que cada um pula",
+      "arquivo": "core/escritor-common/stages/inicializacao/init-estado.md"
+    },
+    {
+      "slug": "captura-semente",
+      "nome": "Captura da Semente",
+      "fase": "ideacao",
+      "ordem": "1.1",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — sem a semente, todo o resto é execução sem direção.",
+      "agente_lider": "escritor-desenvolvimento-agent",
+      "agentes_apoio": [
+        "escritor-aquisicao-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "declaracao-semente",
+        "perguntas-semente"
+      ],
+      "consome": [
+        {
+          "artefato": "plano-de-fluxo",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "init-estado"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "A ideia crua do autor, como ele conseguir dizer",
+      "saidas": "declaracao-semente.md e perguntas-semente.md",
+      "arquivo": "core/escritor-common/stages/ideacao/captura-semente.md"
+    },
+    {
+      "slug": "pesquisa-mercado",
+      "nome": "Pesquisa de Mercado",
+      "fase": "ideacao",
+      "ordem": "1.2",
+      "execucao": "CONDICIONAL",
+      "condicao": "Roda quando a obra tem ambição de publicação ou posicionamento externo. Pula em conto, oficina e em livro escrito só para si.",
+      "agente_lider": "escritor-aquisicao-agent",
+      "agentes_apoio": [
+        "escritor-pesquisa-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "analise-comps",
+        "posicionamento",
+        "leitor-alvo"
+      ],
+      "consome": [
+        {
+          "artefato": "declaracao-semente",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "captura-semente"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "declaracao-semente",
+      "saidas": "analise-comps.md, posicionamento.md, leitor-alvo.md",
+      "arquivo": "core/escritor-common/stages/ideacao/pesquisa-mercado.md"
+    },
+    {
+      "slug": "viabilidade",
+      "nome": "Viabilidade",
+      "fase": "ideacao",
+      "ordem": "1.3",
+      "execucao": "CONDICIONAL",
+      "condicao": "Roda quando a premissa exige domínio que o autor não tem de cabeça. Pula em conto e oficina.",
+      "agente_lider": "escritor-pesquisa-agent",
+      "agentes_apoio": [
+        "escritor-desenvolvimento-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "avaliacao-viabilidade",
+        "riscos-de-pesquisa"
+      ],
+      "consome": [
+        {
+          "artefato": "declaracao-semente",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "captura-semente"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "declaracao-semente",
+      "saidas": "avaliacao-viabilidade.md, riscos-de-pesquisa.md",
+      "arquivo": "core/escritor-common/stages/ideacao/viabilidade.md"
+    },
+    {
+      "slug": "definicao-escopo",
+      "nome": "Definição de Escopo",
+      "fase": "ideacao",
+      "ordem": "1.4",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — extensão, formato e limite precisam ser decididos antes da estrutura.",
+      "agente_lider": "escritor-aquisicao-agent",
+      "agentes_apoio": [
+        "escritor-desenvolvimento-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "escopo-da-obra"
+      ],
+      "consome": [
+        {
+          "artefato": "declaracao-semente",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "analise-comps",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "avaliacao-viabilidade",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "captura-semente",
+        "pesquisa-mercado",
+        "viabilidade"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "declaracao-semente, e o que houver de comps e viabilidade",
+      "saidas": "escopo-da-obra.md",
+      "arquivo": "core/escritor-common/stages/ideacao/definicao-escopo.md"
+    },
+    {
+      "slug": "premissa-e-pitch",
+      "nome": "Premissa e Pitch",
+      "fase": "ideacao",
+      "ordem": "1.5",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — se a premissa não cabe numa frase, a história ainda não foi encontrada.",
+      "agente_lider": "escritor-aquisicao-agent",
+      "agentes_apoio": [
+        "escritor-desenvolvimento-agent"
+      ],
+      "modo": "pipeline",
+      "exige_manuscrito": false,
+      "produz": [
+        "logline",
+        "pitch-paragrafo",
+        "tema-central"
+      ],
+      "consome": [
+        {
+          "artefato": "declaracao-semente",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "escopo-da-obra",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "captura-semente",
+        "definicao-escopo"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "declaracao-semente e escopo-da-obra",
+      "saidas": "logline.md, pitch-paragrafo.md, tema-central.md",
+      "arquivo": "core/escritor-common/stages/ideacao/premissa-e-pitch.md"
+    },
+    {
+      "slug": "aprovacao-conceito",
+      "nome": "Aprovação de Conceito",
+      "fase": "ideacao",
+      "ordem": "1.6",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é o portão que separa \"ideia\" de \"projeto\". Nada de concepção começa antes dele.",
+      "agente_lider": "escritor-editor-chefe-agent",
+      "agentes_apoio": [
+        "escritor-desenvolvimento-agent",
+        "escritor-aquisicao-agent"
+      ],
+      "modo": "mesa",
+      "exige_manuscrito": false,
+      "produz": [
+        "parecer-de-conceito"
+      ],
+      "consome": [
+        {
+          "artefato": "logline",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "escopo-da-obra",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "avaliacao-viabilidade",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "posicionamento",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "premissa-e-pitch",
+        "definicao-escopo"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "Tudo que a Ideação produziu",
+      "saidas": "parecer-de-conceito.md — vale escrever este livro, e com que ressalvas",
+      "arquivo": "core/escritor-common/stages/ideacao/aprovacao-conceito.md"
+    },
+    {
+      "slug": "pilares-criativos",
+      "nome": "Pilares Criativos",
+      "fase": "concepcao",
+      "ordem": "2.1",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — os pilares são a régua contra a qual toda decisão posterior é medida.",
+      "agente_lider": "escritor-desenvolvimento-agent",
+      "agentes_apoio": [
+        "escritor-enredo-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "pilares-criativos"
+      ],
+      "consome": [
+        {
+          "artefato": "declaracao-semente",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "tema-central",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "parecer-de-conceito",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "premissa-e-pitch",
+        "aprovacao-conceito"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "declaracao-semente, tema-central e o parecer de conceito",
+      "saidas": "pilares-criativos.md — de 3 a 5 colunas inegociáveis",
+      "arquivo": "core/escritor-common/stages/concepcao/pilares-criativos.md"
+    },
+    {
+      "slug": "biblia-mundo",
+      "nome": "Bíblia do Mundo",
+      "fase": "concepcao",
+      "ordem": "2.2",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre em obra com mundo secundário ou regras próprias. Em obra realista contemporânea, roda enxuto — mas roda.",
+      "agente_lider": "escritor-mundo-agent",
+      "agentes_apoio": [
+        "escritor-pesquisa-agent",
+        "escritor-continuidade-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "estado-do-mundo",
+        "sistema-e-regras",
+        "cronologia"
+      ],
+      "consome": [
+        {
+          "artefato": "pilares-criativos",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "riscos-de-pesquisa",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "retrato-do-projeto",
+          "obrigatorio": false,
+          "condicionado_a": "retomada"
+        }
+      ],
+      "requer_estagio": [
+        "pilares-criativos"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "Pilares criativos, riscos de pesquisa e — em retomada — o manuscrito existente",
+      "saidas": "estado-do-mundo.md, sistema-e-regras.md, cronologia.md",
+      "arquivo": "core/escritor-common/stages/concepcao/biblia-mundo.md"
+    },
+    {
+      "slug": "convencoes-prosa",
+      "nome": "Convenções de Prosa",
+      "fase": "concepcao",
+      "ordem": "2.3",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é a voz DESTE livro, e é o que muda de livro para livro. Sem ela o prosista escreve genérico.",
+      "agente_lider": "escritor-linha-agent",
+      "agentes_apoio": [
+        "escritor-prosista-agent",
+        "escritor-personagens-agent"
+      ],
+      "modo": "pipeline",
+      "exige_manuscrito": false,
+      "produz": [
+        "convencoes-de-prosa",
+        "frase-exemplar"
+      ],
+      "consome": [
+        {
+          "artefato": "pilares-criativos",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "declaracao-semente",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "pilares-criativos"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada",
+        "oficina"
+      ],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "Os pilares, a semente e — quando houver — manuscrito já aprovado deste livro",
+      "saidas": "convencoes-de-prosa.md e frase-exemplar.md",
+      "arquivo": "core/escritor-common/stages/concepcao/convencoes-prosa.md"
+    },
+    {
+      "slug": "elenco",
+      "nome": "Elenco",
+      "fase": "concepcao",
+      "ordem": "2.4",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — nenhuma cena pode ser escrita sem saber o que as pessoas nela querem.",
+      "agente_lider": "escritor-personagens-agent",
+      "agentes_apoio": [
+        "escritor-enredo-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "protagonista",
+        "antagonista",
+        "elenco-de-apoio"
+      ],
+      "consome": [
+        {
+          "artefato": "pilares-criativos",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "estado-do-mundo",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "pilares-criativos",
+        "biblia-mundo"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "Pilares criativos e estado do mundo",
+      "saidas": "protagonista.md, antagonista.md, elenco-de-apoio.md",
+      "arquivo": "core/escritor-common/stages/concepcao/elenco.md"
+    },
+    {
+      "slug": "estrutura-narrativa",
+      "nome": "Estrutura Narrativa",
+      "fase": "concepcao",
+      "ordem": "2.5",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é onde o arco vira esqueleto de capítulos.",
+      "agente_lider": "escritor-enredo-agent",
+      "agentes_apoio": [
+        "escritor-desenvolvimento-agent"
+      ],
+      "modo": "pipeline",
+      "exige_manuscrito": false,
+      "produz": [
+        "estrutura-narrativa",
+        "viradas"
+      ],
+      "consome": [
+        {
+          "artefato": "pilares-criativos",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "tema-central",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "protagonista",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "elenco"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "Pilares, tema e a ficha do protagonista",
+      "saidas": "estrutura-narrativa.md, viradas.md",
+      "arquivo": "core/escritor-common/stages/concepcao/estrutura-narrativa.md"
+    },
+    {
+      "slug": "lugares",
+      "nome": "Lugares",
+      "fase": "concepcao",
+      "ordem": "2.6",
+      "execucao": "CONDICIONAL",
+      "condicao": "Roda quando o livro tem cenários recorrentes que precisam ser os mesmos em capítulos distantes. Pula em novela, conto e oficina.",
+      "agente_lider": "escritor-mundo-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "exige_manuscrito": false,
+      "produz": [
+        "lugares-do-livro"
+      ],
+      "consome": [
+        {
+          "artefato": "estado-do-mundo",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "biblia-mundo"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "estado-do-mundo",
+      "saidas": "lugares-do-livro.md",
+      "arquivo": "core/escritor-common/stages/concepcao/lugares.md"
+    },
+    {
+      "slug": "plano-capitulos",
+      "nome": "Plano de Capítulos",
+      "fase": "concepcao",
+      "ordem": "2.7",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é o estágio que gera as unidades de trabalho da fase de construção.",
+      "agente_lider": "escritor-enredo-agent",
+      "agentes_apoio": [
+        "escritor-personagens-agent",
+        "escritor-mundo-agent"
+      ],
+      "modo": "mesa",
+      "exige_manuscrito": false,
+      "produz": [
+        "plano-de-capitulos",
+        "mapa-setup-payoff",
+        "unidade-capitulo"
+      ],
+      "consome": [
+        {
+          "artefato": "estrutura-narrativa",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "viradas",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "protagonista",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "sistema-e-regras",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "lugares-do-livro",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "estrutura-narrativa",
+        "lugares"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-desenvolvimento-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "Estrutura narrativa, viradas, fichas e regras do mundo",
+      "saidas": "plano-de-capitulos.md, mapa-setup-payoff.md, unidade-capitulo.md",
+      "arquivo": "core/escritor-common/stages/concepcao/plano-capitulos.md"
+    },
+    {
+      "slug": "outline-cena",
+      "nome": "Outline de Cena",
+      "fase": "construcao",
+      "ordem": "3.1",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — o prosista não abre um capítulo sem saber quem quer o quê e o que impede.",
+      "agente_lider": "escritor-enredo-agent",
+      "agentes_apoio": [
+        "escritor-personagens-agent"
+      ],
+      "modo": "subagente",
+      "para_cada": "unidade-capitulo",
+      "exige_manuscrito": false,
+      "produz": [
+        "outline-de-cenas"
+      ],
+      "consome": [
+        {
+          "artefato": "plano-de-capitulos",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "protagonista",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "convencoes-de-prosa",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "plano-capitulos",
+        "convencoes-prosa"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada",
+        "oficina"
+      ],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "revisor": "escritor-leitor-beta-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "O beat deste capítulo, as fichas de quem está na cena e as convenções de prosa",
+      "saidas": "outline-de-cenas.md — uma cena por bloco, com objetivo, obstáculo, virada e saída",
+      "arquivo": "core/escritor-common/stages/construcao/outline-cena.md"
+    },
+    {
+      "slug": "pesquisa-pontual",
+      "nome": "Pesquisa Pontual",
+      "fase": "construcao",
+      "ordem": "3.2",
+      "execucao": "CONDICIONAL",
+      "condicao": "Roda só quando o outline desta cena sinalizou fato que ninguém levantou. Sem sinalização, pula.",
+      "agente_lider": "escritor-pesquisa-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "para_cada": "unidade-capitulo",
+      "exige_manuscrito": false,
+      "produz": [
+        "dossie-de-cena"
+      ],
+      "consome": [
+        {
+          "artefato": "outline-de-cenas",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "outline-cena"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "O outline desta cena e a marcação de pesquisa",
+      "saidas": "dossie-de-cena.md — o mínimo para a cena não mentir",
+      "arquivo": "core/escritor-common/stages/construcao/pesquisa-pontual.md"
+    },
+    {
+      "slug": "rascunho",
+      "nome": "Rascunho",
+      "fase": "construcao",
+      "ordem": "3.3",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é o estágio em que o livro é efetivamente escrito.",
+      "agente_lider": "escritor-prosista-agent",
+      "agentes_apoio": [
+        "escritor-personagens-agent"
+      ],
+      "modo": "subagente",
+      "para_cada": "unidade-capitulo",
+      "exige_manuscrito": true,
+      "produz": [
+        "nota-de-rascunho"
+      ],
+      "consome": [
+        {
+          "artefato": "outline-de-cenas",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "convencoes-de-prosa",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "frase-exemplar",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "dossie-de-cena",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "outline-cena",
+        "pesquisa-pontual"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada",
+        "oficina"
+      ],
+      "sensores": [
+        "abertura-cena",
+        "registro-baixo",
+        "deriva-pov",
+        "translates",
+        "aforismo",
+        "densidade",
+        "repeticao",
+        "metrica-capitulo"
+      ],
+      "revisor": "escritor-linha-agent",
+      "revisor_max_iteracoes": 3,
+      "entradas": "Outline da cena, convenções de prosa, frase-exemplar, fichas e dossiê",
+      "saidas": "prosa em `05 — Manuscrito/**/Cap NN.md` e nota-de-rascunho.md no registro",
+      "arquivo": "core/escritor-common/stages/construcao/rascunho.md"
+    },
+    {
+      "slug": "passe-linha",
+      "nome": "Passe de Linha",
+      "fase": "construcao",
+      "ordem": "3.4",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — nenhum capítulo fica pronto no primeiro jato.",
+      "agente_lider": "escritor-linha-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "para_cada": "unidade-capitulo",
+      "exige_manuscrito": true,
+      "produz": [
+        "relatorio-de-passe-de-linha"
+      ],
+      "consome": [
+        {
+          "artefato": "nota-de-rascunho",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "convencoes-de-prosa",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "rascunho"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada",
+        "oficina"
+      ],
+      "sensores": [
+        "registro-baixo",
+        "translates",
+        "aforismo",
+        "densidade",
+        "repeticao",
+        "metrica-capitulo"
+      ],
+      "entradas": "O capítulo rascunhado e as convenções de prosa",
+      "saidas": "capítulo revisado em `05 — Manuscrito/` e relatorio-de-passe-de-linha.md",
+      "arquivo": "core/escritor-common/stages/construcao/passe-linha.md"
+    },
+    {
+      "slug": "checagem-continuidade",
+      "nome": "Checagem de Continuidade",
+      "fase": "construcao",
+      "ordem": "3.5",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — divergência barata de consertar agora fica cara no capítulo 24.",
+      "agente_lider": "escritor-continuidade-agent",
+      "agentes_apoio": [
+        "escritor-mundo-agent",
+        "escritor-personagens-agent"
+      ],
+      "modo": "subagente",
+      "para_cada": "unidade-capitulo",
+      "exige_manuscrito": false,
+      "produz": [
+        "relatorio-de-continuidade"
+      ],
+      "consome": [
+        {
+          "artefato": "nota-de-rascunho",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "estado-do-mundo",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "sistema-e-regras",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "cronologia",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "protagonista",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "passe-linha"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "deriva-pov"
+      ],
+      "entradas": "O capítulo revisado, a bíblia, as fichas e a cronologia",
+      "saidas": "relatorio-de-continuidade.md",
+      "arquivo": "core/escritor-common/stages/construcao/checagem-continuidade.md"
+    },
+    {
+      "slug": "leitura-beta",
+      "nome": "Leitura Beta",
+      "fase": "revisao",
+      "ordem": "4.1",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é a única vez em que alguém lê o livro sem saber o que o autor quis dizer.",
+      "agente_lider": "escritor-leitor-beta-agent",
+      "agentes_apoio": [],
+      "modo": "inline",
+      "exige_manuscrito": false,
+      "produz": [
+        "relatorio-de-leitura",
+        "mapa-de-tedio"
+      ],
+      "consome": [
+        {
+          "artefato": "logline",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "pilares-criativos",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "checagem-continuidade"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "entradas": "O manuscrito, e nada mais até o relatório estar escrito",
+      "saidas": "relatorio-de-leitura.md e mapa-de-tedio.md",
+      "arquivo": "core/escritor-common/stages/revisao/leitura-beta.md"
+    },
+    {
+      "slug": "revisao-estrutural-ato",
+      "nome": "Revisão Estrutural de Ato",
+      "fase": "revisao",
+      "ordem": "4.2",
+      "execucao": "CONDICIONAL",
+      "condicao": "Roda em obra dividida em atos com capítulos suficientes para o ritmo importar. Pula em novela, conto e oficina.",
+      "agente_lider": "escritor-desenvolvimento-agent",
+      "agentes_apoio": [
+        "escritor-enredo-agent"
+      ],
+      "modo": "pipeline",
+      "exige_manuscrito": false,
+      "produz": [
+        "diagnostico-de-ato"
+      ],
+      "consome": [
+        {
+          "artefato": "plano-de-capitulos",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "viradas",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "mapa-setup-payoff",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "relatorio-de-leitura",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "mapa-de-tedio",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "leitura-beta"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-leitor-beta-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "O manuscrito completo, o plano de capítulos e as viradas",
+      "saidas": "diagnostico-de-ato.md — um diagnóstico por ato, com endereço",
+      "arquivo": "core/escritor-common/stages/revisao/revisao-estrutural-ato.md"
+    },
+    {
+      "slug": "passe-continuidade-global",
+      "nome": "Passe de Continuidade Global",
+      "fase": "revisao",
+      "ordem": "4.3",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — há erros que só aparecem lendo o livro inteiro de uma vez.",
+      "agente_lider": "escritor-continuidade-agent",
+      "agentes_apoio": [
+        "escritor-mundo-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": false,
+      "produz": [
+        "divergencias-de-canon"
+      ],
+      "consome": [
+        {
+          "artefato": "relatorio-de-continuidade",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "cronologia",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "mapa-setup-payoff",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "revisao-estrutural-ato"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "O manuscrito completo e todos os relatórios de continuidade por capítulo",
+      "saidas": "divergencias-de-canon.md — o registro consolidado, com decisão por item",
+      "arquivo": "core/escritor-common/stages/revisao/passe-continuidade-global.md"
+    },
+    {
+      "slug": "passe-voz",
+      "nome": "Passe de Voz",
+      "fase": "revisao",
+      "ordem": "4.4",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — o capítulo 27 precisa soar como o capítulo 1.",
+      "agente_lider": "escritor-linha-agent",
+      "agentes_apoio": [
+        "escritor-copidesque-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": true,
+      "produz": [
+        "relatorio-de-voz"
+      ],
+      "consome": [
+        {
+          "artefato": "convencoes-de-prosa",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "frase-exemplar",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "passe-continuidade-global"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "registro-baixo",
+        "translates",
+        "aforismo",
+        "densidade",
+        "repeticao"
+      ],
+      "entradas": "O manuscrito completo, as convenções de prosa e a frase-exemplar",
+      "saidas": "relatorio-de-voz.md e o manuscrito uniformizado",
+      "arquivo": "core/escritor-common/stages/revisao/passe-voz.md"
+    },
+    {
+      "slug": "revisao-final",
+      "nome": "Revisão Final",
+      "fase": "revisao",
+      "ordem": "4.5",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — última passagem antes de o texto sair da casa.",
+      "agente_lider": "escritor-copidesque-agent",
+      "agentes_apoio": [
+        "escritor-linha-agent"
+      ],
+      "modo": "subagente",
+      "exige_manuscrito": true,
+      "produz": [
+        "folha-de-estilo",
+        "relatorio-de-copidesque"
+      ],
+      "consome": [
+        {
+          "artefato": "convencoes-de-prosa",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "divergencias-de-canon",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "relatorio-de-leitura",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "passe-voz"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "registro-baixo",
+        "metrica-capitulo"
+      ],
+      "revisor": "escritor-editor-chefe-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "O manuscrito completo e as convenções de prosa",
+      "saidas": "folha-de-estilo.md, relatorio-de-copidesque.md e o manuscrito preparado",
+      "arquivo": "core/escritor-common/stages/revisao/revisao-final.md"
+    },
+    {
+      "slug": "material-submissao",
+      "nome": "Material de Submissão",
+      "fase": "revisao",
+      "ordem": "4.6",
+      "execucao": "CONDICIONAL",
+      "condicao": "Roda quando a obra vai ser submetida a agente, editora ou publicada. Pula em livro escrito só para si e em oficina.",
+      "agente_lider": "escritor-aquisicao-agent",
+      "agentes_apoio": [
+        "escritor-desenvolvimento-agent"
+      ],
+      "modo": "pipeline",
+      "exige_manuscrito": false,
+      "produz": [
+        "sinopse",
+        "carta-de-apresentacao",
+        "texto-de-quarta-capa"
+      ],
+      "consome": [
+        {
+          "artefato": "logline",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "pitch-paragrafo",
+          "obrigatorio": true
+        },
+        {
+          "artefato": "posicionamento",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "analise-comps",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "revisao-final"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "retomada"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "revisor": "escritor-leitor-beta-agent",
+      "revisor_max_iteracoes": 2,
+      "entradas": "O manuscrito pronto, a logline, o pitch e o posicionamento",
+      "saidas": "sinopse.md, carta-de-apresentacao.md, texto-de-quarta-capa.md",
+      "arquivo": "core/escritor-common/stages/revisao/material-submissao.md"
+    },
+    {
+      "slug": "retrospectiva",
+      "nome": "Retrospectiva",
+      "fase": "revisao",
+      "ordem": "4.7",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — é o estágio que faz o próximo livro custar menos que este.",
+      "agente_lider": "escritor-desenvolvimento-agent",
+      "agentes_apoio": [
+        "escritor-linha-agent",
+        "escritor-leitor-beta-agent"
+      ],
+      "modo": "mesa",
+      "exige_manuscrito": false,
+      "produz": [
+        "retrospectiva-da-obra",
+        "regras-promovidas"
+      ],
+      "consome": [
+        {
+          "artefato": "relatorio-de-leitura",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "relatorio-de-voz",
+          "obrigatorio": false
+        },
+        {
+          "artefato": "divergencias-de-canon",
+          "obrigatorio": false
+        }
+      ],
+      "requer_estagio": [
+        "revisao-final"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada",
+        "oficina"
+      ],
+      "sensores": [
+        "secoes-obrigatorias"
+      ],
+      "entradas": "Todos os diários `memoria.md` dos estágios e os relatórios da fase de revisão",
+      "saidas": "retrospectiva-da-obra.md e regras-promovidas.md",
+      "arquivo": "core/escritor-common/stages/revisao/retrospectiva.md"
+    }
+  ]
+}

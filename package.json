@@ -1,0 +1,21 @@
+{
+  "name": "aidlc-escritor",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "AI-DLC Escritor — ciclo de vida dirigido por IA para escrever livros. Porte do awslabs/aidlc-workflows@v2 do domínio de software para o de manuscrito.",
+  "scripts": {
+    "compilar": "bun core/tools/escritor-graph.ts compilar",
+    "checar": "bun core/tools/escritor-graph.ts compilar --checar && bun core/tools/escritor-harness.ts gerar --checar",
+    "harness": "bun core/tools/escritor-harness.ts gerar",
+    "doctor": "bun core/tools/escritor-doctor.ts",
+    "instalar": "./scripts/instalar.sh",
+    "test": "bun test"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}

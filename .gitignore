@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+
+# Obras (manuscritos) nunca entram neste repo — o método é público, o livro é seu.
+/obras/
+*.docx
+*.epub
