@@ -1,15 +1,18 @@
 #!/usr/bin/env bash
 #
-# instalar.sh — liga o AI-DLC Escritor ao Claude Code.
+# instalar.sh — liga o Editora ao Claude Code.
 #
 # Cria links simbólicos de harness/claude/{skills,agents} para dentro de um
 # diretório .claude. Idempotente. NÃO toca em nada que já exista lá e não seja
 # nosso — em especial, preserva as skills prosa-* e metodo-martin do autor.
 #
 # Uso:
-#   ./scripts/instalar.sh                    # instala em ~/LIVROS/.claude
-#   ./scripts/instalar.sh /caminho/.claude   # instala em outro lugar
+#   ./scripts/instalar.sh                    # instala global, em ~/.claude
+#   ./scripts/instalar.sh /caminho/.claude   # instala num projeto específico
 #   ./scripts/instalar.sh --desinstalar      # remove só os links que criamos
+#
+# O padrão é global (~/.claude) de propósito: assim /editora funciona em
+# qualquer diretório, e "começar livro novo" não depende de onde você está.
 
 set -euo pipefail
 
@@ -25,8 +28,8 @@ for arg in "$@"; do
   esac
 done
 
-ALVO="${ALVO:-$HOME/LIVROS/.claude}"
-PREFIXO="escritor"
+ALVO="${ALVO:-$HOME/.claude}"
+PREFIXO="editora"
 
 azul()  { printf '\033[34m%s\033[0m\n' "$1"; }
 verde() { printf '\033[32m  ✓\033[0m %s\n' "$1"; }
@@ -35,7 +38,7 @@ erro()  { printf '\033[31m  ✗\033[0m %s\n' "$1" >&2; }
 
 # --- desinstalação ---------------------------------------------------------
 if [ "$DESINSTALAR" = 1 ]; then
-  azul "Removendo links do AI-DLC Escritor em $ALVO"
+  azul "Removendo links do Editora em $ALVO"
   n=0
   for p in "$ALVO/skills/$PREFIXO" "$ALVO/skills/$PREFIXO"-*; do
     [ -L "$p" ] || continue
@@ -52,16 +55,16 @@ fi
 # --- pré-requisitos --------------------------------------------------------
 command -v bun >/dev/null 2>&1 || { erro "bun não encontrado. Instale em https://bun.sh"; exit 1; }
 
-azul "AI-DLC Escritor → $ALVO"
+azul "Editora → $ALVO"
 echo
 
 # Regenera e valida antes de ligar: nunca instalar um método quebrado.
 cinza "compilando o grafo…"
-bun "$METODO/core/tools/escritor-graph.ts" compilar >/dev/null
+bun "$METODO/core/tools/editora-graph.ts" compilar >/dev/null
 cinza "gerando o harness…"
-bun "$METODO/core/tools/escritor-harness.ts" gerar >/dev/null
+bun "$METODO/core/tools/editora-harness.ts" gerar >/dev/null
 cinza "conferindo a saúde do método…"
-if ! bun "$METODO/core/tools/escritor-doctor.ts" >/dev/null 2>&1; then
+if ! bun "$METODO/core/tools/editora-doctor.ts" >/dev/null 2>&1; then
   erro "doctor reprovou — rode 'bun run doctor' e corrija antes de instalar"
   exit 1
 fi
@@ -99,11 +102,11 @@ verde "agents/ — $n agentes ligados"
 
 # --- variável de ambiente --------------------------------------------------
 echo
-if [ "${ESCRITOR_METODO:-}" != "$METODO" ]; then
+if [ "${EDITORA_METODO:-}" != "$METODO" ]; then
   cinza "opcional: aponte a variável do método no seu shell"
-  printf '\n      export ESCRITOR_METODO="%s"\n\n' "$METODO"
+  printf '\n      export EDITORA_METODO="%s"\n\n' "$METODO"
 fi
 
 azul "Pronto."
-echo "  Abra o Claude Code em ~/LIVROS e use /escritor."
+echo "  Abra o Claude Code em ~/LIVROS e use /editora."
 echo "  As skills prosa-* e metodo-martin continuam intactas."

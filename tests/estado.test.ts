@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, test } from "bun:test";
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { carregarGrafo } from "../core/tools/escritor-lib.ts";
+import { carregarGrafo } from "../core/tools/editora-lib.ts";
 import {
   contarPalavrasCorpo,
   definirStatus,
@@ -13,13 +13,13 @@ import {
   lerEstado,
   proximoEstagio,
   renderizarEstado,
-} from "../core/tools/escritor-state.ts";
+} from "../core/tools/editora-state.ts";
 
 let obra: string;
 const grafo = carregarGrafo();
 
 beforeAll(() => {
-  obra = mkdtempSync(join(tmpdir(), "escritor-teste-"));
+  obra = mkdtempSync(join(tmpdir(), "editora-teste-"));
   mkdirSync(join(obra, "05 — Manuscrito", "Ato 1 — Preparação"), { recursive: true });
   iniciarObra(obra, { titulo: "Obra de Teste", escopo: "romance" });
 });
@@ -93,7 +93,7 @@ describe("guarda de conclusão", () => {
   });
 
   test("aprova quando o artefato existe", () => {
-    const dir = join(obra, ".escritor", "registro", "inicializacao", "init-estado");
+    const dir = join(obra, ".editora", "registro", "inicializacao", "init-estado");
     mkdirSync(dir, { recursive: true });
     writeFileSync(
       join(dir, "plano-de-fluxo.md"),
@@ -107,7 +107,7 @@ describe("guarda de conclusão", () => {
     e.unidades = gerarUnidades(27);
     definirStatus(obra, e, "deteccao-projeto", "em-andamento", { forcar: true });
 
-    const dir = join(obra, ".escritor", "registro", "construcao", "rascunho", "cap-01");
+    const dir = join(obra, ".editora", "registro", "construcao", "rascunho", "cap-01");
     mkdirSync(dir, { recursive: true });
     writeFileSync(join(dir, "nota-de-rascunho.md"), "# Nota\n## A\nx\n## B\ny\n");
     writeFileSync(

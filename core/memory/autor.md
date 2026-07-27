@@ -1,6 +1,6 @@
 # Memória do Autor
 
-> Modelo. Copiado para `<obra>/.escritor/memoria/autor.md` na inicialização, e a
+> Modelo. Copiado para `<obra>/.editora/memoria/autor.md` na inicialização, e a
 > partir daí **compartilhado entre todos os livros**. Nunca reescrito — só recebe
 > linhas novas, pelo ritual do §13.
 

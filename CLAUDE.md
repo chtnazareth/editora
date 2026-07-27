@@ -3,7 +3,7 @@
 Instruções para trabalhar **neste repositório** — o método em si.
 
 Para *conduzir* uma obra usando o método, não é aqui: leia
-`core/escritor-common/conductor.md` e use a skill `/escritor`.
+`core/editora-common/conductor.md` e use a skill `/editora`.
 
 ## O que é
 
@@ -25,11 +25,11 @@ bun run compilar && bun run harness && bun run doctor && bun test
 
 | quero… | mexo em |
 |---|---|
-| mudar um passo de um estágio | `core/escritor-common/stages/<fase>/<slug>.md` |
+| mudar um passo de um estágio | `core/editora-common/stages/<fase>/<slug>.md` |
 | mudar quem lidera / o que produz | o frontmatter do mesmo arquivo, depois `bun run compilar` |
 | mudar uma persona | `core/agents/<slug>.md`, depois `bun run harness` |
-| adicionar um sensor | analisador em `core/tools/escritor-sensores.ts` **e** manifesto em `core/sensors/` — o doctor exige os dois |
-| mudar as regras de portão | `core/escritor-common/protocols/stage-protocol.md` |
+| adicionar um sensor | analisador em `core/tools/editora-sensores.ts` **e** manifesto em `core/sensors/` — o doctor exige os dois |
+| mudar as regras de portão | `core/editora-common/protocols/stage-protocol.md` |
 | mudar o que um escopo executa | o campo `escopos:` de cada estágio (não o arquivo do escopo) |
 
 O campo `escopos:` mora no **estágio**, não no escopo. O arquivo em `core/scopes/`

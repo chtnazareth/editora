@@ -1,4 +1,4 @@
-# AI-DLC Escritor
+# Editora
 
 Um ciclo de vida dirigido por IA para **escrever livros**, portado de
 [awslabs/aidlc-workflows@v2](https://github.com/awslabs/aidlc-workflows/tree/v2) —
@@ -12,7 +12,7 @@ bun run doctor      # o método está são?
 ./scripts/instalar.sh   # liga ao Claude Code em ~/LIVROS/.claude
 ```
 
-Depois, no Claude Code: `/escritor`.
+Depois, no Claude Code: `/editora`.
 
 ---
 
@@ -26,7 +26,7 @@ humano** antes de avançar.
 
 Essa arquitetura transpõe quase 1:1 para a escrita de um romance.
 
-| AI-DLC (software) | AI-DLC Escritor |
+| AI-DLC (software) | Editora |
 |---|---|
 | Ideation: intent, market-research, feasibility, scope | A semente da ideia, gênero e comps, viabilidade de pesquisa, escopo da obra |
 | Inception: requirements, stories, design, units | Bíblia do mundo, elenco, estrutura dos 27 capítulos, convenções de prosa |
@@ -50,7 +50,7 @@ Essa arquitetura transpõe quase 1:1 para a escrita de um romance.
 | **Revisão** | fazer ficar bom, e prepará-lo para sair | 7 |
 
 ```bash
-bun core/tools/escritor-graph.ts mostrar --escopo romance
+bun core/tools/editora-graph.ts mostrar --escopo romance
 ```
 
 ---
@@ -81,14 +81,14 @@ Os quatro primeiros codificam os **quatro venenos** que o autor rejeitou em iter
 seguidas; `abertura-cena` e `densidade` codificam as Leis nº 1 e nº 2 do `metodo-martin`.
 
 Eles rodam sobre o **capítulo do manuscrito**, não sobre o relatório — a separação
-está em `SENSORES_DE_PROSA`, em `escritor-sensor.ts`.
+está em `SENSORES_DE_PROSA`, em `editora-sensor.ts`.
 
 ```bash
 # em qualquer arquivo, mesmo fora de uma obra
-bun core/tools/escritor-sensor.ts rodar --id densidade --arquivo "cap-07.md"
+bun core/tools/editora-sensor.ts rodar --id densidade --arquivo "cap-07.md"
 
 # todos os que o estágio declara
-bun core/tools/escritor-sensor.ts estagio --estagio rascunho --unidade cap-07
+bun core/tools/editora-sensor.ts estagio --estagio rascunho --unidade cap-07
 ```
 
 ### Calibração é obrigação, não luxo
@@ -127,16 +127,16 @@ TypeScript sobre [bun](https://bun.sh). Sem dependências de runtime.
 
 | arquivo | papel |
 |---|---|
-| `escritor-lib.ts` | parser de subconjunto YAML, tipos do grafo, resolução de caminhos |
-| `escritor-stage-schema.ts` | as 16 chaves autorais + invariantes de grafo |
-| `escritor-graph.ts` | compila os `.md` em `stage-graph.json` + `scope-grid.json`, com `--checar` de drift |
-| `escritor-state.ts` | máquina de estados, transições válidas e **guardas de conclusão** |
-| `escritor-orchestrate.ts` | a diretiva de estágio e as transições de ciclo de vida |
-| `escritor-sensores.ts` | os dez analisadores de texto |
-| `escritor-sensor.ts` | executor: separa alvo de prosa de alvo de documento |
-| `escritor-audit.ts` | trilha de auditoria em markdown, legível no Obsidian |
-| `escritor-harness.ts` | gera os subagentes do Claude Code a partir de `core/agents/` |
-| `escritor-doctor.ts` | diagnóstico do método inteiro |
+| `editora-lib.ts` | parser de subconjunto YAML, tipos do grafo, resolução de caminhos |
+| `editora-stage-schema.ts` | as 16 chaves autorais + invariantes de grafo |
+| `editora-graph.ts` | compila os `.md` em `stage-graph.json` + `scope-grid.json`, com `--checar` de drift |
+| `editora-state.ts` | máquina de estados, transições válidas e **guardas de conclusão** |
+| `editora-orchestrate.ts` | a diretiva de estágio e as transições de ciclo de vida |
+| `editora-sensores.ts` | os dez analisadores de texto |
+| `editora-sensor.ts` | executor: separa alvo de prosa de alvo de documento |
+| `editora-audit.ts` | trilha de auditoria em markdown, legível no Obsidian |
+| `editora-harness.ts` | gera os subagentes do Claude Code a partir de `core/agents/` |
+| `editora-doctor.ts` | diagnóstico do método inteiro |
 
 ### As guardas
 
@@ -157,11 +157,11 @@ O que impede o método de "avançar no papel":
 ```
 core/
 ├── agents/                       13 personas
-├── escritor-common/
+├── editora-common/
 │   ├── conductor.md              o laço que o agente executa
 │   ├── protocols/                stage-protocol.md, stage-definition.md
 │   └── stages/<fase>/*.md        os 28 estágios
-├── knowledge/escritor-shared/    princípios
+├── knowledge/editora-shared/    princípios
 ├── memory/                       modelos: autor, projeto, oficina
 ├── scopes/                       6 escopos
 ├── sensors/                      10 manifestos
@@ -171,10 +171,10 @@ scripts/instalar.sh               liga tudo em ~/LIVROS/.claude
 tests/                            84 testes
 ```
 
-Numa obra, o método grava em `<vault>/.escritor/`:
+Numa obra, o método grava em `<vault>/.editora/`:
 
 ```
-.escritor/
+.editora/
 ├── estado.json          fonte de verdade
 ├── estado.md            espelho legível no Obsidian
 ├── registro/<fase>/<estagio>/   os artefatos

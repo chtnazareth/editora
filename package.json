@@ -1,14 +1,14 @@
 {
-  "name": "aidlc-escritor",
+  "name": "editora",
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "AI-DLC Escritor — ciclo de vida dirigido por IA para escrever livros. Porte do awslabs/aidlc-workflows@v2 do domínio de software para o de manuscrito.",
+  "description": "Editora — ciclo de vida dirigido por IA para escrever livros. Porte do awslabs/aidlc-workflows@v2 do domínio de software para o de manuscrito.",
   "scripts": {
-    "compilar": "bun core/tools/escritor-graph.ts compilar",
-    "checar": "bun core/tools/escritor-graph.ts compilar --checar && bun core/tools/escritor-harness.ts gerar --checar",
-    "harness": "bun core/tools/escritor-harness.ts gerar",
-    "doctor": "bun core/tools/escritor-doctor.ts",
+    "compilar": "bun core/tools/editora-graph.ts compilar",
+    "checar": "bun core/tools/editora-graph.ts compilar --checar && bun core/tools/editora-harness.ts gerar --checar",
+    "harness": "bun core/tools/editora-harness.ts gerar",
+    "doctor": "bun core/tools/editora-doctor.ts",
     "instalar": "./scripts/instalar.sh",
     "test": "bun test"
   },

@@ -1,6 +1,6 @@
 # Memória do Projeto
 
-> Modelo. Copiado para `<obra>/.escritor/memoria/projeto.md` na inicialização.
+> Modelo. Copiado para `<obra>/.editora/memoria/projeto.md` na inicialização.
 > Vale **só para este livro**.
 
 Regras, decisões e restrições desta obra que não são deriváveis dos artefatos — o que

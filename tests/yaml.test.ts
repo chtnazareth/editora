@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { lerEscalar, lerFrontmatter, lerYaml } from "../core/tools/escritor-lib.ts";
+import { lerEscalar, lerFrontmatter, lerYaml } from "../core/tools/editora-lib.ts";
 
 describe("lerEscalar", () => {
   test("reconhece os tipos primitivos", () => {

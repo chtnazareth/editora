@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+#
+# editora — a linha de comando da sua editora de agentes.
+#
+# Ponha em PATH e chame de qualquer lugar:
+#   export PATH="$PATH:/caminho/para/editora/bin"
+
+set -euo pipefail
+M="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+T="$M/core/tools"
+
+comando="${1:-status}"
+[ $# -gt 0 ] && shift
+
+case "$comando" in
+  novo)                       exec bun "$T/editora-novo.ts" "$@" ;;
+  status|proximo|iniciar|reportar)
+                              exec bun "$T/editora-orchestrate.ts" "$comando" "$@" ;;
+  estado|unidades|guarda)     exec bun "$T/editora-state.ts" "$comando" "$@" ;;
+  sensor)                     exec bun "$T/editora-sensor.ts" "$@" ;;
+  grafo)                      exec bun "$T/editora-graph.ts" "$@" ;;
+  doctor)                     exec bun "$T/editora-doctor.ts" "$@" ;;
+  compilar)                   exec bun "$T/editora-graph.ts" compilar "$@" ;;
+  instalar)                   exec "$M/scripts/instalar.sh" "$@" ;;
+  -h|--help|ajuda)
+    cat <<'AJUDA'
+
+  editora — uma editora de agentes de IA para escrever livros
+
+  COMEÇAR
+    editora novo "<Título>" [--em <pasta>] [--escopo <escopo>]
+                              cria um livro novo, do zero
+
+  CONDUZIR  (de dentro da pasta do livro)
+    editora status            onde a obra está
+    editora proximo           a diretiva do próximo estágio
+    editora iniciar   --estagio <slug> [--unidade cap-07]
+    editora reportar  --estagio <slug> --resultado <r> [--entrada "…"]
+
+  VERIFICAR
+    editora sensor rodar --id <sensor> --arquivo <caminho>
+    editora sensor estagio --estagio <slug> [--unidade cap-07]
+    editora sensor listar
+    editora guarda --estagio <slug> [--unidade cap-07]
+
+  MÉTODO
+    editora grafo mostrar [--escopo romance] [--fase construcao]
+    editora compilar          regenera o grafo a partir do frontmatter
+    editora doctor            o método está são?
+    editora instalar          liga ao Claude Code
+
+  No Claude Code, a skill /editora conduz tudo isso sozinha.
+
+AJUDA
+    ;;
+  *)
+    echo "editora: comando desconhecido \"$comando\". Use: editora --help" >&2
+    exit 2
+    ;;
+esac

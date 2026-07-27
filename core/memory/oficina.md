@@ -1,6 +1,6 @@
 # Memória da Oficina
 
-> Modelo. Copiado para `<obra>/.escritor/memoria/oficina.md` na inicialização.
+> Modelo. Copiado para `<obra>/.editora/memoria/oficina.md` na inicialização.
 > Descreve o **modo de trabalhar**, não o conteúdo do livro.
 
 Como este autor quer que o método se comporte. É o lugar das regras de processo que

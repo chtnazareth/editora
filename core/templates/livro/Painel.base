@@ -1,0 +1,24 @@
+views:
+  - type: table
+    name: Manuscrito
+    filters:
+      and:
+        - 'tipo == "capitulo"'
+    order:
+      - file.name
+      - status
+      - beat
+      - pov
+      - local
+      - palavras
+    sort:
+      - property: capitulo
+        direction: ASC
+  - type: table
+    name: Personagens
+    filters:
+      and:
+        - 'tipo == "personagem"'
+    order:
+      - file.name
+      - papel

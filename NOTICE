@@ -1,0 +1,17 @@
+Editora
+Copyright 2026 Claudio Nazareth
+
+Este produto inclui trabalho derivado de:
+
+  AI-DLC Workflows (https://github.com/awslabs/aidlc-workflows)
+  Copyright Amazon.com, Inc. ou afiliadas.
+  Licenciado sob a Apache License, Version 2.0.
+
+A metodologia, o vocabulário de estágios, o protocolo de portões de aprovação,
+o sistema de escopos, a topologia de agentes e o ritual de aprendizado foram
+portados do AI-DLC v2 do domínio de desenvolvimento de software para o de
+escrita de manuscrito.
+
+A transposição para escrita, os 13 agentes editoriais, os 28 estágios, os
+sensores de prosa em português brasileiro e o motor em TypeScript são obra
+original deste repositório.

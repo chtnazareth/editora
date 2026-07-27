@@ -5,9 +5,9 @@ import {
   carregarEscopos,
   carregarEstagiosCrus,
   carregarSensores,
-} from "../core/tools/escritor-lib.ts";
-import { compilarGrafo, compilarGradeEscopos } from "../core/tools/escritor-graph.ts";
-import { ANALISADORES } from "../core/tools/escritor-sensores.ts";
+} from "../core/tools/editora-lib.ts";
+import { compilarGrafo, compilarGradeEscopos } from "../core/tools/editora-graph.ts";
+import { ANALISADORES } from "../core/tools/editora-sensores.ts";
 
 const { grafo, problemas } = compilarGrafo();
 

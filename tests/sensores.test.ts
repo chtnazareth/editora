@@ -12,7 +12,7 @@ import {
   sensorSecoesObrigatorias,
   sensorTranslates,
   type Contexto,
-} from "../core/tools/escritor-sensores.ts";
+} from "../core/tools/editora-sensores.ts";
 
 const ctx = (texto: string, extra: Partial<Contexto> = {}): Contexto => ({
   caminho: "teste.md",
