@@ -116,6 +116,8 @@ export interface OpcoesNovaObra {
   em?: string;
   escopo?: string;
   capitulos?: number;
+  /** Monta a obra NA pasta atual, em vez de criar uma subpasta com o título. */
+  aqui?: boolean;
 }
 
 export function criarObra(opcoes: OpcoesNovaObra): string {
@@ -126,11 +128,15 @@ export function criarObra(opcoes: OpcoesNovaObra): string {
   }
 
   const base = resolve(opcoes.em ?? process.cwd());
-  const obra = join(base, pastaDe(opcoes.titulo));
+  // `--aqui` é o caminho normal quando o autor já criou e entrou na pasta do
+  // livro — que é como se começa de verdade. Sem ele, o título vira subpasta.
+  const obra = opcoes.aqui ? base : join(base, pastaDe(opcoes.titulo));
 
   if (!vazioOuInexistente(obra)) {
     throw new Error(
-      `"${obra}" já existe e não está vazia. Escolha outro título ou outro --em.`,
+      opcoes.aqui
+        ? `"${obra}" não está vazia. Entre numa pasta vazia, ou tire o --aqui para criar uma subpasta.`
+        : `"${obra}" já existe e não está vazia. Escolha outro título ou outro --em.`,
     );
   }
   if (existsSync(join(obra, ".editora"))) {
@@ -163,7 +169,8 @@ export function criarObra(opcoes: OpcoesNovaObra): string {
 
   const proximo = lerEstado(obra);
   console.log(`\n  Próximo passo — abra o Claude Code nesta pasta e use /editora.`);
-  console.log(`  Ou veja o percurso:\n`);
+  console.log(`  A primeira etapa é a sabatina: ele vai te interrogar sobre a ideia.`);
+  console.log(`\n  Para ver o percurso inteiro:\n`);
   console.log(`    bun ${join(raizMetodo(), "core/tools/editora-graph.ts")} mostrar --escopo ${proximo.escopo}\n`);
   return obra;
 }
@@ -184,12 +191,16 @@ function main(): number {
     console.error(`
   uso: editora-novo.ts "<Título do Livro>" [opções]
 
-    --em <caminho>       onde criar a pasta (padrão: diretório atual)
+    --aqui               monta na pasta atual, sem criar subpasta
+    --em <caminho>       onde criar a subpasta (padrão: diretório atual)
     --escopo <nome>      ${carregarEscopos().map((e) => e.nome).join(" | ")}
     --capitulos <n>      quantas unidades gerar (padrão: 27, ou 1 em conto/oficina)
 
-  exemplo:
-    bun editora-novo.ts "A Torre Partida" --em ~/Livros --escopo romance
+  exemplos:
+    mkdir torre && cd torre
+    editora novo "A Torre Partida" --aqui --escopo romance
+
+    editora novo "A Torre Partida" --em ~/Livros --escopo romance
 `);
     return 2;
   }
@@ -200,6 +211,7 @@ function main(): number {
       em: arg("em"),
       escopo: arg("escopo"),
       capitulos: arg("capitulos") ? Number(arg("capitulos")) : undefined,
+      aqui: process.argv.includes("--aqui"),
     });
     return 0;
   } catch (e) {

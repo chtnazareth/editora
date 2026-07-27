@@ -13,8 +13,10 @@ produz:
 consome:
   - artefato: plano-de-fluxo
     obrigatorio: true
+  - artefato: dossie-da-ideia
+    obrigatorio: true
 requer_estagio:
-  - init-estado
+  - sabatina
 escopos:
   - romance
   - serie

@@ -1,6 +1,6 @@
 ---
-name: escritor
-description: Conduz o Editora — o ciclo de vida completo de um livro, da semente da ideia ao material de submissão, em 28 estágios com portões de aprovação do autor. Invocar para começar um livro novo do zero, retomar um manuscrito existente, saber em que estágio a obra está, escrever ou revisar o próximo capítulo dentro do método, ou rodar os sensores de prosa. O framework é autossuficiente: traz o molde dos 27 capítulos embutido e não depende de nenhuma pasta preexistente.
+name: editora
+description: Conduz a Editora — o ciclo de vida completo de um livro, da ideia crua ao material de submissão, em 29 estágios com portões de aprovação do autor. Aceita a ideia como argumento (`/editora quero escrever sobre…`) e conduz da frase solta até a estrutura criada e a sabatina. Invocar para começar um livro novo do zero, retomar um manuscrito existente, saber em que estágio a obra está, escrever ou revisar o próximo capítulo dentro do método, ou rodar os sensores de prosa. O framework é autossuficiente: traz o molde dos 27 capítulos embutido e não depende de nenhuma pasta preexistente.
 ---
 
 # Editora
@@ -29,20 +29,68 @@ bun "$M/core/tools/editora-orchestrate.ts" status
 Sem obra ativa, o autor quer **começar ou retomar** — vá para a seção abaixo. Com obra,
 vá para **O laço**.
 
-## Livro novo, do zero
+## Livro novo: da ideia crua à estrutura
 
-Um comando cria tudo. O molde dos 27 capítulos vem embutido no método; não há
-dependência de pasta preexistente.
+Esta é a porta de entrada, e ela é **conversa antes de arquivo**.
+
+O autor chega assim, tipicamente de dentro de uma pasta vazia que ele acabou de criar:
+
+> `/editora quero escrever sobre um cartógrafo cujos mapas mudam sozinhos`
+
+### Passo 1 — Devolva a ideia em uma frase
+
+Antes de qualquer pergunta, repita a ideia de volta com suas palavras e confirme que
+entendeu. Metade das conversas ruins começa interrogando a ideia errada.
+
+Se o autor invocou `/editora` sem dizer nada, pergunte o que ele quer escrever — uma
+pergunta aberta, e só essa.
+
+### Passo 2 — Levante os fatos, não pergunte por eles
+
+Antes da primeira pergunta de decisão, **pesquise**: esta premissa já foi usada, e por
+quem? O que o gênero convenciona? O que isso vai exigir de pesquisa?
+
+Chegue à mesa com *"isto lê como fantasia contemporânea; as comps mais próximas fazem
+assim"*, e não com *"que gênero é?"*.
+
+### Passo 3 — Só duas perguntas antes de criar
+
+Para montar a estrutura você precisa de **duas coisas**, e nada além:
+
+1. **O escopo** — proponha um, a partir da ideia, e mostre o que ele pula
+2. **Um título provisório** — diga que é provisório, e que a sabatina pode trocá-lo
+
+Todo o resto é assunto da **sabatina**, que vem logo em seguida e é o lugar certo para
+isso. Não interrogue a ideia aqui: você faria fora do método, sem gravar nada.
+
+### Passo 4 — Criar
+
+O autor já está dentro da pasta do livro (o caso normal):
+
+```bash
+bun "$M/core/tools/editora-novo.ts" "<Título>" --aqui --escopo <escopo>
+```
+
+Ou você cria a pasta para ele:
 
 ```bash
 bun "$M/core/tools/editora-novo.ts" "<Título>" --em <pasta-pai> --escopo <escopo>
 ```
 
-Ele copia o molde, troca o título, cria `.editora/`, inicializa o estado, gera as
+Isso copia o molde, troca o título, cria `.editora/`, inicializa o estado, gera as
 unidades-capítulo e liga a memória do autor à global (`~/.editora/autor.md`) — que é
 o que faz uma regra aprendida num livro valer no seguinte.
 
-**Pergunte antes, de forma estruturada:** o título, onde criar a pasta, e o escopo.
+### Passo 5 — Inicialização e sabatina, sem parar no meio
+
+Os três estágios de inicialização **não têm portão**. Rode-os em sequência e entre
+direto na `sabatina` (estágio 1.1), que é onde a ideia vai ser de fato interrogada —
+agora com a estrutura no disco e tudo sendo gravado no registro.
+
+Não pare para perguntar "quer continuar?" entre criar e sabatinar. O autor já disse o
+que queria quando digitou a ideia.
+
+### A tabela de escopos, para a proposta do Passo 3
 
 | escopo | para |
 |---|---|

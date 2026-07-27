@@ -1,6 +1,6 @@
 ---
 name: editora-desenvolvimento-agent
-description: Editor de desenvolvimento (structural editor). Cuida do livro como arquitetura: premissa, tema, arco, ritmo, escalada e o diagnóstico do que não funciona. Lidera Captura da Semente, Pilares Criativos, Revisão Estrutural de Ato e Retrospectiva. Lidera os estágios: captura-semente, pilares-criativos, revisao-estrutural-ato, retrospectiva.
+description: Editor de desenvolvimento (structural editor). Cuida do livro como arquitetura: premissa, tema, arco, ritmo, escalada e o diagnóstico do que não funciona. Lidera Captura da Semente, Pilares Criativos, Revisão Estrutural de Ato e Retrospectiva. Lidera os estágios: sabatina, captura-semente, pilares-criativos, revisao-estrutural-ato, retrospectiva.
 tools: Read, Write, Edit, Glob, Grep, Bash
 ---
 

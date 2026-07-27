@@ -1,6 +1,6 @@
 {
   "versao": "1",
-  "compilado_em": "2026-07-27T20:51:15Z",
+  "compilado_em": "2026-07-27T21:00:53Z",
   "estagios": [
     {
       "slug": "deteccao-projeto",
@@ -94,10 +94,53 @@
       "arquivo": "core/editora-common/stages/inicializacao/init-estado.md"
     },
     {
+      "slug": "sabatina",
+      "nome": "Sabatina",
+      "fase": "ideacao",
+      "ordem": "1.1",
+      "execucao": "SEMPRE",
+      "condicao": "Sempre — nenhuma decisão do livro deve chegar ao capítulo 1 por omissão.",
+      "agente_lider": "editora-desenvolvimento-agent",
+      "agentes_apoio": [
+        "editora-aquisicao-agent",
+        "editora-pesquisa-agent"
+      ],
+      "modo": "mesa",
+      "exige_manuscrito": false,
+      "produz": [
+        "dossie-da-ideia",
+        "perguntas-adiadas"
+      ],
+      "consome": [
+        {
+          "artefato": "plano-de-fluxo",
+          "obrigatorio": true
+        }
+      ],
+      "requer_estagio": [
+        "init-estado"
+      ],
+      "escopos": [
+        "romance",
+        "serie",
+        "novela",
+        "conto",
+        "retomada",
+        "oficina"
+      ],
+      "sensores": [
+        "secoes-obrigatorias",
+        "cobertura-upstream"
+      ],
+      "entradas": "A ideia crua do autor, como ele conseguir dizer",
+      "saidas": "dossie-da-ideia.md e perguntas-adiadas.md",
+      "arquivo": "core/editora-common/stages/ideacao/sabatina.md"
+    },
+    {
       "slug": "captura-semente",
       "nome": "Captura da Semente",
       "fase": "ideacao",
-      "ordem": "1.1",
+      "ordem": "1.2",
       "execucao": "SEMPRE",
       "condicao": "Sempre — sem a semente, todo o resto é execução sem direção.",
       "agente_lider": "editora-desenvolvimento-agent",
@@ -114,10 +157,14 @@
         {
           "artefato": "plano-de-fluxo",
           "obrigatorio": true
+        },
+        {
+          "artefato": "dossie-da-ideia",
+          "obrigatorio": true
         }
       ],
       "requer_estagio": [
-        "init-estado"
+        "sabatina"
       ],
       "escopos": [
         "romance",
@@ -138,7 +185,7 @@
       "slug": "pesquisa-mercado",
       "nome": "Pesquisa de Mercado",
       "fase": "ideacao",
-      "ordem": "1.2",
+      "ordem": "1.3",
       "execucao": "CONDICIONAL",
       "condicao": "Roda quando a obra tem ambição de publicação ou posicionamento externo. Pula em conto, oficina e em livro escrito só para si.",
       "agente_lider": "editora-aquisicao-agent",
@@ -180,7 +227,7 @@
       "slug": "viabilidade",
       "nome": "Viabilidade",
       "fase": "ideacao",
-      "ordem": "1.3",
+      "ordem": "1.4",
       "execucao": "CONDICIONAL",
       "condicao": "Roda quando a premissa exige domínio que o autor não tem de cabeça. Pula em conto e oficina.",
       "agente_lider": "editora-pesquisa-agent",
@@ -220,7 +267,7 @@
       "slug": "definicao-escopo",
       "nome": "Definição de Escopo",
       "fase": "ideacao",
-      "ordem": "1.4",
+      "ordem": "1.5",
       "execucao": "SEMPRE",
       "condicao": "Sempre — extensão, formato e limite precisam ser decididos antes da estrutura.",
       "agente_lider": "editora-aquisicao-agent",
@@ -271,7 +318,7 @@
       "slug": "premissa-e-pitch",
       "nome": "Premissa e Pitch",
       "fase": "ideacao",
-      "ordem": "1.5",
+      "ordem": "1.6",
       "execucao": "SEMPRE",
       "condicao": "Sempre — se a premissa não cabe numa frase, a história ainda não foi encontrada.",
       "agente_lider": "editora-aquisicao-agent",
@@ -318,7 +365,7 @@
       "slug": "aprovacao-conceito",
       "nome": "Aprovação de Conceito",
       "fase": "ideacao",
-      "ordem": "1.6",
+      "ordem": "1.7",
       "execucao": "SEMPRE",
       "condicao": "Sempre — é o portão que separa \"ideia\" de \"projeto\". Nada de concepção começa antes dele.",
       "agente_lider": "editora-editor-chefe-agent",

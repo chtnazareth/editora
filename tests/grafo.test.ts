@@ -146,6 +146,26 @@ describe("ordem editorial", () => {
     expect(ordemDe("revisao-final")).toBeGreaterThan(ordemDe("passe-continuidade-global"));
   });
 
+  test("a sabatina é a primeiríssima etapa depois da inicialização", () => {
+    // A porta de entrada: interrogar a ideia antes de qualquer outra coisa.
+    const ideacao = grafo.estagios.filter((e) => e.fase === "ideacao");
+    expect(ideacao[0].slug).toBe("sabatina");
+    expect(ideacao[0].ordem).toBe("1.1");
+  });
+
+  test("a captura da semente bebe do dossiê da sabatina", () => {
+    const captura = grafo.estagios.find((e) => e.slug === "captura-semente")!;
+    expect(captura.requer_estagio).toContain("sabatina");
+    expect(captura.consome.map((c) => c.artefato)).toContain("dossie-da-ideia");
+  });
+
+  test("a sabatina roda em todo escopo — nenhum livro começa sem ser interrogado", () => {
+    const sabatina = grafo.estagios.find((e) => e.slug === "sabatina")!;
+    for (const nome of carregarEscopos().map((e) => e.nome)) {
+      expect(sabatina.escopos).toContain(nome);
+    }
+  });
+
   test("as convenções de prosa vêm antes de qualquer rascunho", () => {
     expect(ordemDe("convencoes-prosa")).toBeLessThan(ordemDe("rascunho"));
   });

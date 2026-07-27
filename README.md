@@ -4,7 +4,7 @@ Um ciclo de vida dirigido por IA para **escrever livros**, portado de
 [awslabs/aidlc-workflows@v2](https://github.com/awslabs/aidlc-workflows/tree/v2) —
 que faz a mesma coisa para software.
 
-28 estágios em 5 fases, 13 agentes-persona, 6 escopos, 10 sensores determinísticos
+29 estágios em 5 fases, 13 agentes-persona, 6 escopos, 10 sensores determinísticos
 sobre o texto, e um portão de aprovação humana em cada etapa.
 
 ```bash
@@ -44,7 +44,7 @@ Essa arquitetura transpõe quase 1:1 para a escrita de um romance.
 | fase | pergunta que responde | estágios |
 |---|---|---|
 | **Inicialização** | onde este livro mora e o que já existe dele | 3 |
-| **Ideação** | vale escrever este livro, e que livro é | 6 |
+| **Ideação** | vale escrever este livro, e que livro é | 7 |
 | **Concepção** | como ele é por dentro: mundo, gente, estrutura, voz | 7 |
 | **Construção** | escrever, capítulo a capítulo | 5 (em laço × 27) |
 | **Revisão** | fazer ficar bom, e prepará-lo para sair | 7 |
@@ -52,6 +52,18 @@ Essa arquitetura transpõe quase 1:1 para a escrita de um romance.
 ```bash
 bun core/tools/editora-graph.ts mostrar --escopo romance
 ```
+
+### A sabatina abre tudo
+
+O estágio `1.1` não existe no AI-DLC original e é a porta de entrada: uma entrevista
+implacável sobre a ideia crua, **uma pergunta por vez**, cada uma com recomendação, e
+com a regra que a torna útil — *se é fato, o método pesquisa; se é decisão, é do autor*.
+
+Ela existe para que nenhuma decisão do livro chegue ao capítulo 1 por omissão. Sai dela
+um `dossie-da-ideia` que os seis estágios seguintes da Ideação consomem — e que registra,
+para cada decisão fechada, **a alternativa que foi descartada e por quê**.
+
+Inspirada na skill `grilling`.
 
 ---
 
@@ -108,7 +120,7 @@ Falso positivo novo vira calibração pelo ritual de aprendizado, e fica registr
 
 ## Os escopos
 
-Nem todo texto precisa dos 28 estágios.
+Nem todo texto precisa dos 29 estágios.
 
 | escopo | profundidade | para |
 |---|---|---|
@@ -160,7 +172,7 @@ core/
 ├── editora-common/
 │   ├── conductor.md              o laço que o agente executa
 │   ├── protocols/                stage-protocol.md, stage-definition.md
-│   └── stages/<fase>/*.md        os 28 estágios
+│   └── stages/<fase>/*.md        os 29 estágios
 ├── knowledge/editora-shared/    princípios
 ├── memory/                       modelos: autor, projeto, oficina
 ├── scopes/                       6 escopos
@@ -168,7 +180,7 @@ core/
 └── tools/                        o motor
 harness/claude/                   skills e agentes do Claude Code (gerados)
 scripts/instalar.sh               liga tudo em ~/LIVROS/.claude
-tests/                            84 testes
+tests/                            101 testes
 ```
 
 Numa obra, o método grava em `<vault>/.editora/`:
@@ -208,7 +220,7 @@ verificação que nunca mais deixa passar.
 ## Desenvolvimento
 
 ```bash
-bun test                 # 84 testes
+bun test                 # 101 testes
 bun run compilar         # regenera stage-graph.json e scope-grid.json
 bun run checar           # falha se o compilado driftou do frontmatter
 bun run harness          # regenera os subagentes do Claude Code
@@ -231,5 +243,5 @@ O instalador preserva todas elas.
 
 Metodologia, vocabulário de estágios, protocolo de portões, sistema de escopos e o
 ritual de aprendizado são portados de **awslabs/aidlc-workflows@v2** (Apache-2.0).
-A transposição para escrita, os 13 agentes, os 28 estágios e os sensores de prosa em
+A transposição para escrita, os 13 agentes, os 29 estágios e os sensores de prosa em
 português são deste repositório.
