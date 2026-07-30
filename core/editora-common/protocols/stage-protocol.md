@@ -449,3 +449,27 @@ ele escolher quais valem um desvio.
 `editora revisar --cancelar` devolve cada passo ao status que tinha antes. É saída
 legítima: o autor abriu o desvio, olhou, e concluiu que estava bom.
 
+---
+
+## 15. Versões do capítulo
+
+Toda etapa com `exige_manuscrito` arquiva o capítulo **automaticamente**: ao abrir
+(o texto que a reescrita vai apagar) e ao aprovar (o marco para o qual o autor vai
+querer voltar). Versão idêntica à anterior não é guardada duas vezes.
+
+**Você não precisa fazer nada** — o motor cuida. O que você precisa é *saber que
+existe* e oferecer quando fizer sentido.
+
+```bash
+editora versoes --unidade cap-07                  # o histórico
+editora versoes --unidade cap-07 --ver 2          # ler uma versão
+editora versoes --unidade cap-07 --restaurar 2    # devolver o capítulo a ela
+```
+
+Ofereça o histórico quando o autor disser que a versão anterior era melhor, quando
+pedir para comparar duas aberturas, ou quando um desvio for reabrir um capítulo
+escrito há muito tempo — antes de o prosista tocar nele.
+
+Restaurar **guarda a versão atual antes**: desfazer o desfazer sempre é possível, e
+o autor precisa ouvir isso quando hesitar.
+

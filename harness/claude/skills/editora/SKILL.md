@@ -193,6 +193,18 @@ com `restam` e `retorno_nome` — **diga ao autor em que volta ele está e quant
 falta**. Ao aprovar o último passo, o motor fecha e anuncia o retorno; reproduza a
 linha dele.
 
+**O texto anterior nunca se perde.** Toda etapa que grava prosa arquiva o capítulo
+automaticamente, ao abrir e ao aprovar. Quando o autor disser que a versão de antes
+era melhor:
+
+```bash
+bun "$M/core/tools/editora-versoes.ts" --unidade cap-07
+bun "$M/core/tools/editora-versoes.ts" --unidade cap-07 --restaurar 2
+```
+
+Restaurar guarda a versão atual antes — diga isso a ele, porque é o que destrava a
+hesitação.
+
 **Mexeu em canon?** Capítulos já escritos podem ter virado mentira, e nada avisa
 sozinho — prosa não tem compilador:
 

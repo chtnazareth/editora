@@ -111,6 +111,26 @@ Cap 18   7 ocorrências   [ ] pendente    (sem risco)
 Ele **mostra e não aplica**. Depois de meses, reabrir dez capítulos sem perguntar
 seria hostil.
 
+### Versões: o texto anterior nunca se perde
+
+Escritor volta atrás — para pegar um parágrafo que cortou, para comparar duas
+aberturas, para recuperar a versão de quatro meses atrás que era pior no geral mas
+tinha uma frase melhor. A pasta do livro não é repositório git e não precisa ser.
+
+Toda etapa que grava prosa arquiva o capítulo sozinha, ao abrir e ao aprovar:
+
+```bash
+editora versoes --unidade cap-07
+
+  2 versão(ões) de Cap 07
+     1.  2026-07-30  Passe de Linha   aprovado    1.840 palavras   hoje
+     2.  2026-03-14  Rascunho         aprovado    1.455 palavras   4 meses atrás
+
+editora versoes --unidade cap-07 --restaurar 2
+```
+
+Restaurar guarda a versão atual antes — desfazer o desfazer também funciona.
+
 ### Retomada
 
 ```bash
@@ -236,7 +256,7 @@ core/
 └── tools/                        o motor
 harness/claude/                   skills e agentes do Claude Code (gerados)
 scripts/instalar.sh               liga tudo em ~/LIVROS/.claude
-tests/                            125 testes
+tests/                            133 testes
 ```
 
 Numa obra, o método grava em `<vault>/.editora/`:
@@ -276,7 +296,7 @@ verificação que nunca mais deixa passar.
 ## Desenvolvimento
 
 ```bash
-bun test                 # 125 testes
+bun test                 # 133 testes
 bun run compilar         # regenera stage-graph.json e scope-grid.json
 bun run checar           # falha se o compilado driftou do frontmatter
 bun run harness          # regenera os subagentes do Claude Code

@@ -20,6 +20,7 @@ case "$comando" in
   resumo)                     exec bun "$T/editora-resumo.ts" "$@" ;;
   revisar)                    exec bun "$T/editora-revisar.ts" "$@" ;;
   impacto)                    exec bun "$T/editora-impacto.ts" "$@" ;;
+  versoes)                    exec bun "$T/editora-versoes.ts" "$@" ;;
   sensor)                     exec bun "$T/editora-sensor.ts" "$@" ;;
   grafo)                      exec bun "$T/editora-graph.ts" "$@" ;;
   doctor)                     exec bun "$T/editora-doctor.ts" "$@" ;;
@@ -43,6 +44,8 @@ case "$comando" in
     editora revisar --estagio elenco       repensar uma etapa de canon
     editora revisar --cancelar             desiste e restaura tudo
     editora impacto --termo "<termo>"      que capítulos escritos citam isto
+    editora versoes --unidade cap-07       o histórico do capítulo
+    editora versoes --unidade cap-07 --restaurar 2
 
   CONDUZIR
     editora status            onde a obra está

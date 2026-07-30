@@ -97,6 +97,10 @@ aprovados podem ter virado mentira. Mostre a lista; nunca reabra por conta próp
 
 Detalhe completo no §14 do stage-protocol.
 
+**O texto anterior está a salvo.** Toda etapa que grava prosa arquiva o capítulo
+sozinha, ao abrir e ao aprovar. Antes de reabrir um capítulo antigo, vale dizer isso
+ao autor — e `editora versoes --unidade <u>` mostra o histórico dele. §15.
+
 ## Estágios em laço
 
 `para_cada: unidade-capitulo` faz o estágio rodar uma vez por capítulo. O motor

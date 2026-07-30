@@ -23,6 +23,7 @@ import {
   type Grafo,
 } from "./editora-lib.ts";
 import { registrar, registrarBloco } from "./editora-audit.ts";
+import { arquivar } from "./editora-versoes.ts";
 import {
   definirStatus,
   estagiosNoEscopo,
@@ -280,6 +281,13 @@ function comandoIniciar(obra: string): number {
     }
   }
   registrar(obra, "ESTAGIO_INICIADO", { estagio: estagio.slug, unidade: unidade ?? undefined });
+
+  // Etapa que grava prosa: guarda o que existe ANTES de alguém reescrever.
+  // É a única chance de salvar a versão que a próxima gravação vai apagar.
+  if (estagio.exige_manuscrito && unidade) {
+    const r = arquivar(obra, unidade, estagio.slug, "antes");
+    if (r.arquivado) console.error(`  · versão anterior guardada (${r.versao!.palavras} palavras)`);
+  }
   console.log(
     JSON.stringify(montarDiretiva(obra, lerEstado(obra), grafo, estagio, unidade), null, 2),
   );
@@ -338,6 +346,9 @@ function comandoReportar(obra: string): number {
         { estagio: estagio.slug, unidade: unidade ?? undefined, escolha: entrada },
       );
       registrar(obra, "ESTAGIO_CONCLUIDO", { estagio: estagio.slug });
+
+      // Versão aprovada: o marco para o qual o autor vai querer voltar.
+      if (estagio.exige_manuscrito && unidade) arquivar(obra, unidade, estagio.slug, "aprovado");
 
       estado = lerEstado(obra);
       if (unidade && estagio.para_cada) {
