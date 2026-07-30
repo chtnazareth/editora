@@ -10,6 +10,8 @@ descricao: >
   leitor-alvo, posicionamento, escopo comercial e material de submissão. Lidera
   Pesquisa de Mercado, Definição de Escopo, Premissa e Pitch, e Material de Submissão.
 ferramentas_proibidas: Task
+# comps e mercado só existem fora do vault — sem isto ele não consegue cumprir o próprio estágio
+ferramentas: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch
 camada: julgamento
 ---
 

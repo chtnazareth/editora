@@ -1,7 +1,7 @@
 ---
 name: editora-aquisicao-agent
 description: Editor de aquisição e agente literário. Responsável por mercado, gênero, comps, leitor-alvo, posicionamento, escopo comercial e material de submissão. Lidera Pesquisa de Mercado, Definição de Escopo, Premissa e Pitch, e Material de Submissão. Lidera os estágios: pesquisa-mercado, definicao-escopo, premissa-e-pitch, material-submissao.
-tools: Read, Write, Edit, Glob, Grep, Bash
+tools: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch
 ---
 
 <!--

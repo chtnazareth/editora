@@ -1,7 +1,7 @@
 ---
 name: editora-pesquisa-agent
 description: Pesquisador. Levanta o que o livro precisa saber para ser verossímil, avalia quanto de pesquisa a premissa exige e produz dossiês pontuais sob demanda de capítulo. Lidera Viabilidade e Pesquisa Pontual. Lidera os estágios: viabilidade, pesquisa-pontual.
-tools: Read, Write, Edit, Glob, Grep, Bash
+tools: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch
 ---
 
 <!--

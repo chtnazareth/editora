@@ -17,6 +17,9 @@ case "$comando" in
   status|proximo|iniciar|reportar)
                               exec bun "$T/editora-orchestrate.ts" "$comando" "$@" ;;
   estado|unidades|guarda)     exec bun "$T/editora-state.ts" "$comando" "$@" ;;
+  resumo)                     exec bun "$T/editora-resumo.ts" "$@" ;;
+  revisar)                    exec bun "$T/editora-revisar.ts" "$@" ;;
+  impacto)                    exec bun "$T/editora-impacto.ts" "$@" ;;
   sensor)                     exec bun "$T/editora-sensor.ts" "$@" ;;
   grafo)                      exec bun "$T/editora-graph.ts" "$@" ;;
   doctor)                     exec bun "$T/editora-doctor.ts" "$@" ;;
@@ -31,7 +34,17 @@ case "$comando" in
     editora novo "<Título>" [--em <pasta>] [--escopo <escopo>]
                               cria um livro novo, do zero
 
-  CONDUZIR  (de dentro da pasta do livro)
+  RETOMAR  (de dentro da pasta do livro)
+    editora resumo            onde parou, o que espera por você, o que ficou em aberto
+
+  VOLTAR ATRÁS  — sem perder o lugar
+    editora revisar --sobre "<termo>"      acha onde ele vive e propõe o alvo
+    editora revisar --unidade cap-07       o ciclo daquele capítulo
+    editora revisar --estagio elenco       repensar uma etapa de canon
+    editora revisar --cancelar             desiste e restaura tudo
+    editora impacto --termo "<termo>"      que capítulos escritos citam isto
+
+  CONDUZIR
     editora status            onde a obra está
     editora proximo           a diretiva do próximo estágio
     editora iniciar   --estagio <slug> [--unidade cap-07]

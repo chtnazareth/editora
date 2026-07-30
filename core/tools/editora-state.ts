@@ -72,6 +72,31 @@ export interface Unidade {
   estagios: Record<string, StatusEstagio>;
 }
 
+export interface AlvoDesvio {
+  estagio: string;
+  unidade: string | null;
+}
+
+/**
+ * Um desvio é uma volta atrás deliberada: o autor sai do caminho reto para
+ * revisitar alguma coisa — um capítulo, uma ficha, uma regra do mundo — e o
+ * motor guarda onde ele estava, para devolvê-lo ao mesmo ponto depois.
+ *
+ * É o que torna o método utilizável num livro. Software entrega e segue em
+ * frente; um livro leva meses e não é escrito em linha reta.
+ */
+export interface Desvio {
+  alvo: AlvoDesvio;
+  /** O alvo mais a cascata, na ordem em que serão percorridos. */
+  cascata: AlvoDesvio[];
+  /** Onde o autor estava — capturado ANTES de qualquer mudança de status. */
+  retorno: { estagio: string | null; unidade: string | null };
+  /** Status de cada passo antes de reabrir, para o cancelamento ser honesto. */
+  antes: { estagio: string; unidade: string | null; status: StatusEstagio }[];
+  motivo?: string;
+  aberto_em: string;
+}
+
 export interface Estado {
   versao: string;
   titulo: string;
@@ -85,9 +110,12 @@ export interface Estado {
   autonomia_construcao: "indefinida" | "autonoma" | "com-portao";
   estagios: Record<string, EstadoEstagio>;
   unidades: Unidade[];
+  desvio: Desvio | null;
+  /** Quando o autor esteve aqui pela última vez — alimenta o resumo. */
+  ultimo_acesso: string;
 }
 
-const VERSAO_ESTADO = "1";
+const VERSAO_ESTADO = "2";
 
 // ---------------------------------------------------------------------------
 // Persistência
@@ -97,7 +125,18 @@ export function lerEstado(obra: string): Estado {
   const c = caminhoEstado(obra);
   if (!existsSync(c))
     throw new Error(`Obra sem estado (${c}). Rode: editora-state.ts iniciar`);
-  return JSON.parse(readFileSync(c, "utf8")) as Estado;
+  return migrar(JSON.parse(readFileSync(c, "utf8")) as Estado);
+}
+
+/**
+ * Obra criada numa versão anterior do estado não pode quebrar ao abrir — um
+ * livro dura meses e o método vai mudar por baixo dele.
+ */
+export function migrar(estado: Estado): Estado {
+  if (estado.desvio === undefined) estado.desvio = null;
+  if (!estado.ultimo_acesso) estado.ultimo_acesso = estado.criado_em;
+  estado.versao = VERSAO_ESTADO;
+  return estado;
 }
 
 export function gravarEstado(obra: string, estado: Estado): void {
@@ -283,6 +322,147 @@ export function definirStatus(
 }
 
 // ---------------------------------------------------------------------------
+// Desvio: sair do caminho reto e voltar ao mesmo ponto
+// ---------------------------------------------------------------------------
+
+/** Primeira unidade que ainda não passou por este estágio. */
+export function proximaUnidade(estado: Estado, slug: string): string | null {
+  for (const u of estado.unidades) {
+    const st = u.estagios[slug];
+    if (st !== "concluido" && st !== "pulado") return u.id;
+  }
+  return null;
+}
+
+/**
+ * A fila que um desvio vai percorrer.
+ *
+ * Para estágio de laço: ele e os seguintes do mesmo laço, naquele capítulo —
+ * porque texto que mudou precisa de passe de linha e de continuidade refeitos.
+ * Deixar o capítulo reescrito marcado como "conferido" é o erro silencioso que
+ * esta cascata existe para evitar. Fora do laço, só ele.
+ */
+export function cascataDe(
+  grafo: Grafo,
+  estado: Estado,
+  slug: string,
+  unidade: string | null,
+  soEsta = false,
+): AlvoDesvio[] {
+  const estagio = grafo.estagios.find((e) => e.slug === slug);
+  if (!estagio) throw new Error(`Estágio desconhecido: "${slug}"`);
+  if (soEsta || !estagio.para_cada || !unidade) return [{ estagio: slug, unidade }];
+
+  const noEscopo = estagiosNoEscopo(grafo, estado.escopo);
+  const i = noEscopo.findIndex((e) => e.slug === slug);
+  return noEscopo
+    .slice(i)
+    .filter((e) => e.para_cada === estagio.para_cada)
+    .map((e) => ({ estagio: e.slug, unidade }));
+}
+
+/** Reabre a etapa de UMA unidade — o que hoje nenhum outro comando faz. */
+export function reabrirEtapaDaUnidade(
+  estado: Estado,
+  slug: string,
+  unidadeId: string,
+): void {
+  const u = estado.unidades.find((x) => x.id === unidadeId);
+  if (!u) throw new Error(`Unidade desconhecida: "${unidadeId}"`);
+  u.estagios[slug] = "pendente";
+  u.status = "em-andamento";
+}
+
+export function abrirDesvio(
+  obra: string,
+  estado: Estado,
+  grafo: Grafo,
+  alvo: AlvoDesvio,
+  opcoes: { motivo?: string; soEsta?: boolean } = {},
+): Desvio {
+  if (estado.desvio)
+    throw new Error(
+      `Já existe um desvio aberto em "${estado.desvio.alvo.estagio}". Feche-o, ou cancele com --cancelar.`,
+    );
+
+  // O retorno é capturado ANTES de mexer em qualquer status. Depois da
+  // reabertura o cursor já estaria contaminado e apontaria para o próprio alvo.
+  const cursor = proximoEstagio(estado, grafo);
+  const retorno = {
+    estagio: cursor?.slug ?? null,
+    unidade: cursor?.para_cada ? proximaUnidade(estado, cursor.slug) : null,
+  };
+
+  const cascata = cascataDe(grafo, estado, alvo.estagio, alvo.unidade, opcoes.soEsta);
+
+  // Guarda o antes de cada passo, para que desistir do desvio devolva o estado
+  // exatamente como estava — e não deixe um capítulo aprovado marcado como
+  // pendente porque o autor mudou de ideia.
+  const antes = cascata.map((p) => ({
+    estagio: p.estagio,
+    unidade: p.unidade,
+    status: (p.unidade
+      ? estado.unidades.find((u) => u.id === p.unidade)?.estagios[p.estagio]
+      : estado.estagios[p.estagio]?.status) ?? "pendente",
+  }));
+
+  for (const passo of cascata) {
+    definirStatus(obra, estado, passo.estagio, "pendente", { forcar: true });
+    if (passo.unidade) reabrirEtapaDaUnidade(estado, passo.estagio, passo.unidade);
+  }
+
+  estado.desvio = {
+    alvo,
+    cascata,
+    retorno,
+    antes,
+    motivo: opcoes.motivo,
+    aberto_em: agoraISO(),
+  };
+  gravarEstado(obra, estado);
+  return estado.desvio;
+}
+
+/** O próximo passo pendente da cascata, ou null quando ela acabou. */
+export function proximoDoDesvio(estado: Estado): AlvoDesvio | null {
+  if (!estado.desvio) return null;
+  for (const passo of estado.desvio.cascata) {
+    const st = passo.unidade
+      ? estado.unidades.find((u) => u.id === passo.unidade)?.estagios[passo.estagio]
+      : estado.estagios[passo.estagio]?.status;
+    if (st !== "concluido" && st !== "pulado") return passo;
+  }
+  return null;
+}
+
+/** Desiste do desvio e devolve cada passo ao status que tinha antes. */
+export function cancelarDesvio(obra: string, estado: Estado): Desvio | null {
+  const desvio = estado.desvio;
+  if (!desvio) return null;
+  for (const p of desvio.antes) {
+    definirStatus(obra, estado, p.estagio, p.status, { forcar: true });
+    if (p.unidade) {
+      const u = estado.unidades.find((x) => x.id === p.unidade);
+      if (u) u.estagios[p.estagio] = p.status;
+    }
+  }
+  estado.desvio = null;
+  gravarEstado(obra, estado);
+  return desvio;
+}
+
+export function fecharDesvio(
+  obra: string,
+  estado: Estado,
+): Desvio["retorno"] | null {
+  if (!estado.desvio) return null;
+  const retorno = estado.desvio.retorno;
+  estado.desvio = null;
+  gravarEstado(obra, estado);
+  return retorno;
+}
+
+// ---------------------------------------------------------------------------
 // Espelho markdown
 // ---------------------------------------------------------------------------
 
@@ -310,6 +490,20 @@ export function renderizarEstado(estado: Estado): string {
     `**Progresso:** ${feitos}/${noEscopo.length} estágios no escopo (${grafo.estagios.length} compilados)`,
     `**Autonomia da construção:** ${estado.autonomia_construcao}`,
     "",
+  ];
+
+  if (estado.desvio) {
+    const d = estado.desvio;
+    const onde = d.alvo.unidade ? `${d.alvo.estagio} · ${d.alvo.unidade}` : d.alvo.estagio;
+    linhas.push(
+      "> [!warning] Desvio aberto",
+      `> Revisando **${onde}**${d.motivo ? ` — ${d.motivo}` : ""}, desde ${d.aberto_em.slice(0, 10)}.`,
+      `> Ao fechar, o método volta sozinho para **${d.retorno.estagio ?? "o fim do fluxo"}**.`,
+      "",
+    );
+  }
+
+  linhas.push(
     "| marca | significado |",
     "|---|---|",
     "| `[ ]` | pendente | ",
@@ -319,7 +513,7 @@ export function renderizarEstado(estado: Estado): string {
     "| `[x]` | concluído |",
     "| `[S]` | pulado pelo escopo |",
     "",
-  ];
+  );
 
   let faseAtual: Fase | null = null;
   for (const e of noEscopo) {
@@ -392,6 +586,8 @@ export function iniciarObra(
     autonomia_construcao: "indefinida",
     estagios: {},
     unidades: [],
+    desvio: null,
+    ultimo_acesso: agoraISO(),
   };
   for (const sub of ["registro", "auditoria", "memoria", "conhecimento"]) {
     mkdirSync(join(dirEscritor(obra), sub), { recursive: true });
@@ -509,4 +705,11 @@ function main(): number {
   }
 }
 
-if (import.meta.main) process.exit(main());
+if (import.meta.main) {
+  try {
+    process.exit(main());
+  } catch (e) {
+    console.error(`\n  ✗ ${(e as Error).message}\n`);
+    process.exit(1);
+  }
+}

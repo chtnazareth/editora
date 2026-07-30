@@ -26,13 +26,22 @@ import { registrar, registrarBloco } from "./editora-audit.ts";
 import {
   definirStatus,
   estagiosNoEscopo,
+  fecharDesvio,
   guardaConclusao,
   lerEstado,
   gravarEstado,
+  proximaUnidade,
   proximoDepoisDe,
+  proximoDoDesvio,
   proximoEstagio,
   type Estado,
 } from "./editora-state.ts";
+
+/**
+ * Estágios cujo produto é canon vivo. Fechar um desvio num deles significa que
+ * capítulos já escritos podem ter virado mentira — daí o aviso de impacto.
+ */
+const ESTAGIOS_DE_CANON = ["elenco", "lugares", "biblia-mundo", "estrutura-narrativa"];
 
 /** Depois de 3 ciclos de "pedir mudanças" o portão ganha "Aceitar como está". */
 export const CICLOS_ATE_ESCAPE = 3;
@@ -72,6 +81,13 @@ export interface Diretiva {
   proximo_estagio_nome: string | null;
   ciclos_revisao: number;
   escape_hatch: boolean;
+  desvio: {
+    ativo: boolean;
+    motivo: string | null;
+    restam: number;
+    retorno_para: string | null;
+    retorno_nome: string | null;
+  } | null;
   progresso: {
     feitos: number;
     total_escopo: number;
@@ -158,6 +174,21 @@ export function montarDiretiva(
     proximo_estagio_nome: prox?.nome ?? null,
     ciclos_revisao: ciclos,
     escape_hatch: ciclos >= CICLOS_ATE_ESCAPE,
+    desvio: estado.desvio
+      ? {
+          ativo: true,
+          motivo: estado.desvio.motivo ?? null,
+          restam: estado.desvio.cascata.filter((p) => {
+            const st = p.unidade
+              ? estado.unidades.find((u) => u.id === p.unidade)?.estagios[p.estagio]
+              : estado.estagios[p.estagio]?.status;
+            return st !== "concluido" && st !== "pulado";
+          }).length,
+          retorno_para: estado.desvio.retorno.estagio,
+          retorno_nome:
+            grafo.estagios.find((e) => e.slug === estado.desvio?.retorno.estagio)?.nome ?? null,
+        }
+      : null,
     progresso: {
       feitos,
       total_escopo: noEscopo.length,
@@ -166,18 +197,6 @@ export function montarDiretiva(
       fase_total: daFase.length,
     },
   };
-}
-
-// ---------------------------------------------------------------------------
-// Próxima unidade pendente (fase de construção)
-// ---------------------------------------------------------------------------
-
-function proximaUnidade(estado: Estado, slug: string): string | null {
-  for (const u of estado.unidades) {
-    const st = u.estagios[slug];
-    if (st !== "concluido" && st !== "pulado") return u.id;
-  }
-  return null;
 }
 
 // ---------------------------------------------------------------------------
@@ -192,6 +211,19 @@ function arg(nome: string): string | undefined {
 function comandoProximo(obra: string): number {
   const grafo = carregarGrafo();
   const estado = lerEstado(obra);
+  // Havendo desvio aberto, o próximo é o passo da cascata — nunca o
+  // escaneamento linear. É isto que impede o autor de perder o lugar.
+  const passo = proximoDoDesvio(estado);
+  if (passo) {
+    const alvo = grafo.estagios.find((e) => e.slug === passo.estagio);
+    if (alvo) {
+      console.log(
+        JSON.stringify(montarDiretiva(obra, estado, grafo, alvo, passo.unidade), null, 2),
+      );
+      return 0;
+    }
+  }
+
   const estagio = proximoEstagio(estado, grafo);
 
   if (!estagio) {
@@ -270,6 +302,14 @@ function comandoReportar(obra: string): number {
 
   switch (resultado) {
     case "aguardando-aprovacao": {
+      const st = estado.estagios[estagio.slug]?.status ?? "pendente";
+      if (st === "pendente") {
+        console.error(
+          `✗ "${estagio.slug}" ainda não foi aberto. Rode antes:\n` +
+            `    editora iniciar --estagio ${estagio.slug}${unidade ? ` --unidade ${unidade}` : ""}`,
+        );
+        return 1;
+      }
       const g = guardaConclusao(obra, estagio, unidade ?? undefined);
       for (const a of g.avisos) console.warn(`⚠ ${a}`);
       if (!g.passou) {
@@ -324,7 +364,35 @@ function comandoReportar(obra: string): number {
         }
       }
 
+      // Acabou a cascata do desvio? Restaura o cursor e anuncia o retorno.
+      // É o momento em que o autor recupera o lugar que tinha antes da volta.
       estado = lerEstado(obra);
+      if (estado.desvio && !proximoDoDesvio(estado)) {
+        const alvo = estado.desvio.alvo;
+        const retorno = fecharDesvio(obra, estado);
+        registrar(obra, "DESVIO_FECHADO", {
+          alvo: alvo.estagio,
+          unidade: alvo.unidade ?? undefined,
+        });
+        const onde = alvo.unidade ? `${alvo.estagio} · ${alvo.unidade}` : alvo.estagio;
+        console.log(`✓ desvio em "${onde}" fechado.`);
+        const destino = retorno?.estagio
+          ? grafo.estagios.find((e) => e.slug === retorno.estagio)
+          : null;
+        console.log(
+          destino
+            ? `  ↩ voltando para onde você estava: ${destino.ordem} ${destino.nome} (${destino.agente_lider})`
+            : "  ↩ não havia ponto de retorno — seguindo o caminho normal.",
+        );
+        if (ESTAGIOS_DE_CANON.includes(alvo.estagio)) {
+          console.log(
+            `\n  Isto mexeu em canon. Capítulos já escritos podem ter virado mentira:\n` +
+              `    editora impacto --artefato <o que você mudou>`,
+          );
+        }
+        return 0;
+      }
+
       const prox = proximoEstagio(estado, grafo);
       if (!prox) {
         registrar(obra, "FLUXO_CONCLUIDO", { titulo: estado.titulo });
@@ -430,4 +498,11 @@ function main(): number {
   }
 }
 
-if (import.meta.main) process.exit(main());
+if (import.meta.main) {
+  try {
+    process.exit(main());
+  } catch (e) {
+    console.error(`\n  ✗ ${(e as Error).message}\n`);
+    process.exit(1);
+  }
+}

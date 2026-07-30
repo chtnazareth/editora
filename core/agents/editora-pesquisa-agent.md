@@ -9,6 +9,8 @@ descricao: >
   quanto de pesquisa a premissa exige e produz dossiês pontuais sob demanda de
   capítulo. Lidera Viabilidade e Pesquisa Pontual.
 ferramentas_proibidas: Task
+# levantar fato é a função inteira dele — sem isto ele não consegue cumprir o próprio estágio
+ferramentas: Read, Write, Edit, Glob, Grep, Bash, WebSearch, WebFetch
 camada: julgamento
 ---
 

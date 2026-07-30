@@ -23,11 +23,16 @@ Daqui em diante, `M` é o caminho do método.
 ## Primeiro passo, sempre
 
 ```bash
-bun "$M/core/tools/editora-orchestrate.ts" status
+bun "$M/core/tools/editora-resumo.ts"
 ```
 
-Sem obra ativa, o autor quer **começar ou retomar** — vá para a seção abaixo. Com obra,
-vá para **O laço**.
+Numa obra existente, **abra sempre por aqui e mostre o resumo ao autor** antes de
+qualquer outra coisa. Um livro leva meses; ele pode estar voltando depois de semanas
+e não lembrar onde parou, o que decidiu, nem o que ficou em aberto. O resumo responde
+isso em dez linhas.
+
+Se não houver obra ativa, o comando avisa — e aí o autor quer **começar ou retomar**:
+vá para a seção abaixo. Com obra, vá para **O laço**.
 
 ## Livro novo: da ideia crua à estrutura
 
@@ -165,6 +170,38 @@ No estágio `rascunho` e em qualquer um que toque o manuscrito, antes da primeir
 
 Os quatro venenos, todos ao mesmo tempo: translatês, aforismo de para-choque, registro
 oral/baixo, prosa densa demais. As duas leis: cena-não-ensaio, clareza-primeiro.
+
+## Voltar atrás — a qualquer momento, sobre qualquer coisa
+
+Livro não é software: o caminho é reto por padrão, mas o autor vai querer revisitar
+coisas por meses. Quando ele disser *"quero repensar a Vela"*, *"vamos rever o
+capítulo 7"* ou *"o nome dessa cidade não funciona"*, **não reabra nada à mão** —
+abra um desvio, e o motor guarda o lugar dele:
+
+```bash
+bun "$M/core/tools/editora-revisar.ts" --sobre "Vela" --motivo "endurecer a ficha"
+bun "$M/core/tools/editora-revisar.ts" --unidade cap-07
+bun "$M/core/tools/editora-revisar.ts" --cancelar
+```
+
+`--sobre` é o modo principal: ele procura o termo nas fichas, no canon e nos
+capítulos, mostra onde aparece e propõe o alvo. O autor nunca precisa saber o slug
+de um estágio.
+
+Com desvio aberto, `proximo` devolve o passo da cascata e a diretiva traz `desvio`
+com `restam` e `retorno_nome` — **diga ao autor em que volta ele está e quanto
+falta**. Ao aprovar o último passo, o motor fecha e anuncia o retorno; reproduza a
+linha dele.
+
+**Mexeu em canon?** Capítulos já escritos podem ter virado mentira, e nada avisa
+sozinho — prosa não tem compilador:
+
+```bash
+bun "$M/core/tools/editora-impacto.ts" --termo "Vela"
+```
+
+Leve a lista ao autor. **Nunca reabra capítulos automaticamente**: depois de meses,
+reabrir dez capítulos sem perguntar é hostil.
 
 ## Sensores
 

@@ -33,8 +33,15 @@ function renderizarAgente(
   camada: string,
   corpo: string,
   estagiosLiderados: string[],
+  ferramentasDeclaradas?: string,
 ): string {
-  const ferramentas = FERRAMENTAS_POR_CAMADA[camada] ?? FERRAMENTAS_POR_CAMADA.julgamento;
+  // A declaração do agente vence a camada. Sem isso, o Pesquisador — cuja
+  // função inteira é levantar fato — ficava sem acesso à web, e a sabatina
+  // pedia pesquisa que ninguém podia fazer.
+  const ferramentas =
+    ferramentasDeclaradas ??
+    FERRAMENTAS_POR_CAMADA[camada] ??
+    FERRAMENTAS_POR_CAMADA.julgamento;
   const lidera =
     estagiosLiderados.length > 0
       ? ` Lidera os estágios: ${estagiosLiderados.join(", ")}.`
@@ -68,7 +75,7 @@ function gerar(checar: boolean): number {
       .map((e) => e.slug);
     arquivos.set(
       `${a.slug}.md`,
-      renderizarAgente(a.slug, a.descricao, a.camada, a.corpo, lidera),
+      renderizarAgente(a.slug, a.descricao, a.camada, a.corpo, lidera, a.ferramentas),
     );
   }
 

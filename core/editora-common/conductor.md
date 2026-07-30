@@ -9,6 +9,7 @@ julgamento criativo pertence aos agentes; toda a decisão pertence ao autor.
 ## O laço
 
 ```
+0.  resumo         → SEMPRE, ao abrir a sessão numa obra que já existe
 1.  proximo        → o motor diz qual estágio, com que agente, produzindo o quê
 2.  iniciar        → marca em andamento, registra na auditoria
 3.  carregar       → persona do líder + conhecimento + memórias + artefatos de consome
@@ -74,6 +75,27 @@ bun {{METODO}}/core/tools/editora-orchestrate.ts reportar --estagio <slug> --res
 | **CONCEPÇÃO** | como ele é por dentro: mundo, gente, estrutura, voz |
 | **CONSTRUÇÃO** | escrever, capítulo a capítulo |
 | **REVISÃO** | fazer ficar bom, e prepará-lo para sair |
+
+## Desvio: sair do caminho reto e voltar
+
+Um livro é revisitado por meses. Quando o autor quiser mexer em algo que já passou —
+um capítulo, uma ficha, uma regra do mundo — **não reabra nada à mão**: abra um
+desvio, e o motor guarda onde ele estava.
+
+```bash
+editora revisar --sobre "Vela"       # acha onde vive e propõe o alvo
+editora revisar --unidade cap-07     # o ciclo daquele capítulo
+editora revisar --cancelar           # desiste e restaura tudo
+```
+
+Com desvio aberto, `proximo` devolve o passo da cascata e a diretiva traz o bloco
+`desvio`. Ao aprovar o último passo, o motor fecha, restaura o cursor e anuncia o
+retorno — reproduza a linha dele.
+
+Desvio que mexeu em canon pede `editora impacto` antes de seguir: capítulos já
+aprovados podem ter virado mentira. Mostre a lista; nunca reabra por conta própria.
+
+Detalhe completo no §14 do stage-protocol.
 
 ## Estágios em laço
 

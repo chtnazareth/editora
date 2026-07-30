@@ -325,6 +325,12 @@ export interface Agente {
   nome_exibicao: string;
   descricao: string;
   camada: string;
+  /**
+   * Lista explícita de ferramentas, quando a camada não basta. Existe porque
+   * agente que levanta fato precisa de acesso à web — e a maioria NÃO deve ter:
+   * prosista pesquisando no meio da cena inventa canon.
+   */
+  ferramentas?: string;
   arquivo: string;
   corpo: string;
 }
@@ -529,6 +535,7 @@ export function carregarAgentes(dir: string = dirAgentes()): Agente[] {
       nome_exibicao: String(dados.nome_exibicao ?? ""),
       descricao: String(dados.descricao ?? ""),
       camada: String(dados.camada ?? "julgamento"),
+      ferramentas: dados.ferramentas ? String(dados.ferramentas) : undefined,
       arquivo,
       corpo,
     };

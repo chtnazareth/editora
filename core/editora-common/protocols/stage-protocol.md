@@ -376,3 +376,76 @@ livros, e o que é específico fica onde é específico.
 
 Quando o autor manda voltar a um estágio já concluído, o artefato antigo é preservado
 na auditoria antes de ser reescrito. Nada é perdido em silêncio.
+
+---
+
+## 14. Desvio e retorno
+
+Livro não é software. Software entrega e segue em frente; um livro leva meses e é
+revisitado — o autor chega no capítulo 19 e quer repensar a protagonista, relê o
+capítulo 1 seis meses depois, muda o nome de uma cidade.
+
+O caminho reto continua sendo o padrão. O **desvio** é a saída controlada dele.
+
+### Quando abrir
+
+Sempre que o autor quiser mexer em algo que já passou. **Nunca improvise a volta:**
+se você reabrir um estágio por conta própria, o autor perde o lugar e o motor não
+sabe para onde devolvê-lo.
+
+```bash
+editora revisar --sobre "<termo>"     # o modo principal
+editora revisar --unidade cap-07
+editora revisar --estagio elenco
+```
+
+Traduza o pedido em linguagem natural: *"quero repensar a Vela"* vira
+`--sobre "Vela"`. Ele procura o termo nas fichas, no canon e nos capítulos, e propõe
+o alvo — o autor não precisa saber slug de estágio nenhum.
+
+### A cascata
+
+Reabrir uma etapa de capítulo reabre **ela e as seguintes daquele capítulo**. Texto
+que mudou precisa de passe de linha e de continuidade refeitos; deixar um capítulo
+reescrito marcado como "conferido" é exatamente o erro silencioso que a cascata
+existe para evitar.
+
+`--so-esta` desliga a cascata, quando a mudança é cirúrgica.
+
+### Enquanto o desvio está aberto
+
+`proximo` devolve o passo da cascata, não o caminho linear. A diretiva traz o bloco
+`desvio` com `restam` e `retorno_nome`: **diga ao autor em que desvio ele está e
+quanto falta**, em toda mensagem de conclusão. Sem isso ele se perde dentro da
+própria volta atrás.
+
+### O retorno
+
+Aprovado o último passo, o motor fecha o desvio, restaura o cursor e anuncia:
+
+```
+✓ desvio em "rascunho · cap-07" fechado.
+  ↩ voltando para onde você estava: 4.4 Passe de Voz (editora-linha-agent)
+```
+
+Reproduza o que o motor imprimiu; não invente o destino.
+
+### Desvio em canon: mostre o impacto, nunca aplique
+
+Fechando um desvio em `elenco`, `lugares`, `biblia-mundo` ou `estrutura-narrativa`,
+capítulos já escritos podem ter virado mentira — e nada avisa sozinho, porque prosa
+não tem compilador. Rode:
+
+```bash
+editora impacto --artefato <o que mudou>
+```
+
+e leve a lista ao autor. **Nunca reabra capítulos automaticamente.** Depois de meses
+de trabalho, reabrir dez capítulos sem perguntar é hostil: mostre a conta e deixe
+ele escolher quais valem um desvio.
+
+### Desistir
+
+`editora revisar --cancelar` devolve cada passo ao status que tinha antes. É saída
+legítima: o autor abriu o desvio, olhou, e concluiu que estava bom.
+

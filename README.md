@@ -67,6 +67,62 @@ Inspirada na skill `grilling`.
 
 ---
 
+## O loop: voltar atrás sem perder o lugar
+
+Livro não é software. Software entrega e segue em frente; um livro leva meses e é
+revisitado — você chega no capítulo 19 e quer repensar a protagonista, relê o
+capítulo 1 seis meses depois, troca o nome de uma cidade.
+
+O caminho é reto por padrão. O **desvio** é a saída controlada dele:
+
+```bash
+editora revisar --sobre "Vela"     # acha onde ela vive e propõe o alvo
+editora revisar --unidade cap-07   # o ciclo daquele capítulo
+editora revisar --cancelar         # desiste e restaura tudo
+```
+
+O motor guarda onde você estava **antes** de reabrir qualquer coisa. Terminada a
+revisão, ele fecha o desvio e te devolve:
+
+```
+✓ desvio em "rascunho · cap-07" fechado.
+  ↩ voltando para onde você estava: 4.4 Passe de Voz
+```
+
+Reabrir uma etapa de capítulo arrasta as seguintes daquele capítulo — texto que mudou
+precisa de continuidade refeita. `--so-esta` desliga isso.
+
+### Impacto: o que a mudança quebrou
+
+Em software, renomear é seguro porque o compilador acha todas as referências. **Prosa
+não tem compilador**: você repensa a protagonista no mês 4 e os capítulos do mês 1
+continuam marcados como prontos, mesmo contradizendo a ficha nova.
+
+```bash
+editora impacto --termo "Vela"
+```
+
+```
+Cap 03   4 ocorrências   [x] concluído   ← reconferir
+Cap 09   1 ocorrência    [x] concluído   ← reconferir
+Cap 18   7 ocorrências   [ ] pendente    (sem risco)
+```
+
+Ele **mostra e não aplica**. Depois de meses, reabrir dez capítulos sem perguntar
+seria hostil.
+
+### Retomada
+
+```bash
+editora resumo
+```
+
+Onde você parou, o que está esperando sua decisão, o que decidiu desde a última
+sessão, e as perguntas que ficaram em aberto — inclusive as que a sabatina adiou com
+prazo. A skill abre por aqui, sem você pedir.
+
+---
+
 ## Os sensores
 
 É a parte que não existia no original e é o que dá alavancagem ao método.
@@ -180,7 +236,7 @@ core/
 └── tools/                        o motor
 harness/claude/                   skills e agentes do Claude Code (gerados)
 scripts/instalar.sh               liga tudo em ~/LIVROS/.claude
-tests/                            101 testes
+tests/                            125 testes
 ```
 
 Numa obra, o método grava em `<vault>/.editora/`:
@@ -220,7 +276,7 @@ verificação que nunca mais deixa passar.
 ## Desenvolvimento
 
 ```bash
-bun test                 # 101 testes
+bun test                 # 125 testes
 bun run compilar         # regenera stage-graph.json e scope-grid.json
 bun run checar           # falha se o compilado driftou do frontmatter
 bun run harness          # regenera os subagentes do Claude Code
