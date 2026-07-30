@@ -9,10 +9,12 @@
  * Uso: bun core/tools/editora-doctor.ts [--consertar]
  */
 
-import { existsSync } from "node:fs";
+import { existsSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 import {
   FASES,
   caminhoGradeEscopos,
+  dirCore,
   caminhoGrafo,
   carregarAgentes,
   carregarEscopos,
@@ -96,6 +98,21 @@ function main(): number {
       escopos
         .filter((s) => !estagios.some((e) => e.escopos.includes(s.nome)))
         .map((s) => `escopo "${s.nome}" não é nomeado por nenhum estágio`),
+    ),
+
+    checar("todo agente tem conhecimento", () =>
+      agentes
+        .filter((a) => {
+          const dir = join(dirCore(), "knowledge", a.slug);
+          return (
+            !existsSync(dir) ||
+            readdirSync(dir).filter((f) => f.endsWith(".md")).length === 0
+          );
+        })
+        .map(
+          (a) =>
+            `agente "${a.slug}" tem a pasta de conhecimento vazia — mas a persona dele promete carregá-la`,
+        ),
     ),
 
     checar("todo sensor declarado tem analisador", () =>

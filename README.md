@@ -194,6 +194,24 @@ Falso positivo novo vira calibração pelo ritual de aprendizado, e fica registr
 
 ---
 
+## A base de conhecimento
+
+Os 13 agentes não são só personas: cada um carrega ofício em
+`core/knowledge/<agente>/`. São 35 arquivos — anatomia de cena, setup e payoff, custo de
+regra, ficha como previsão de comportamento, pontuação de diálogo em português, o
+mercado editorial brasileiro, as quatro lentes da leitura beta.
+
+**Duas camadas, e o motivo importa.** `core/knowledge/` é público e carrega ofício de
+qualquer autor. A calibração pessoal — registro-alvo, régua de manuscrito, o gosto de
+quem escreve — vive em `~/.editora/autor.md`, privado e por autor. Um teste guarda a
+fronteira: se um arquivo público citar um autor, um título ou um caminho de manuscrito,
+a suíte reprova.
+
+E o `doctor` recusa agente com pasta de conhecimento vazia — persona que promete
+carregar conhecimento inexistente não passa.
+
+---
+
 ## Os escopos
 
 Nem todo texto precisa dos 29 estágios.
@@ -256,7 +274,7 @@ core/
 └── tools/                        o motor
 harness/claude/                   skills e agentes do Claude Code (gerados)
 scripts/instalar.sh               liga tudo em ~/LIVROS/.claude
-tests/                            133 testes
+tests/                            143 testes
 ```
 
 Numa obra, o método grava em `<vault>/.editora/`:
@@ -296,7 +314,7 @@ verificação que nunca mais deixa passar.
 ## Desenvolvimento
 
 ```bash
-bun test                 # 133 testes
+bun test                 # 143 testes
 bun run compilar         # regenera stage-graph.json e scope-grid.json
 bun run checar           # falha se o compilado driftou do frontmatter
 bun run harness          # regenera os subagentes do Claude Code

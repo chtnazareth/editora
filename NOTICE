@@ -12,6 +12,16 @@ o sistema de escopos, a topologia de agentes e o ritual de aprendizado foram
 portados do AI-DLC v2 do domínio de desenvolvimento de software para o de
 escrita de manuscrito.
 
-A transposição para escrita, os 13 agentes editoriais, os 28 estágios, os
-sensores de prosa em português brasileiro e o motor em TypeScript são obra
+Parte da base de conhecimento sobre marcas de texto gerado por IA foi adaptada de:
+
+  Signs of AI writing (Wikipédia, WikiProject AI Cleanup)
+  via a skill "humanizer" — https://github.com/nathanpainchaud/humanizer
+  Licenciada sob MIT.
+
+Adaptada, não traduzida: vários padrões do catálogo original descrevem o inglês
+e não valem em português — notadamente a recomendação de cortar travessões, que
+em português são a pontuação correta de diálogo.
+
+A transposição para escrita, os 13 agentes editoriais, os 29 estágios, a base de
+conhecimento em português, os sensores de prosa e o motor em TypeScript são obra
 original deste repositório.
