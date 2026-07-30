@@ -30,6 +30,9 @@ sensores:
   - aforismo
   - densidade
   - repeticao
+  - regra-de-tres
+  - hedging
+  - variacao-elegante
   - metrica-capitulo
 entradas: O capítulo rascunhado e as convenções de prosa
 saidas: capítulo revisado em `05 — Manuscrito/` e relatorio-de-passe-de-linha.md

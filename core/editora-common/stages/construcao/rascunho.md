@@ -40,6 +40,9 @@ sensores:
   - aforismo
   - densidade
   - repeticao
+  - regra-de-tres
+  - hedging
+  - final-de-capitulo
   - metrica-capitulo
 entradas: Outline da cena, convenções de prosa, frase-exemplar, fichas e dossiê
 saidas: prosa em `05 — Manuscrito/**/Cap NN.md` e nota-de-rascunho.md no registro

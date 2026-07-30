@@ -21,6 +21,7 @@ case "$comando" in
   revisar)                    exec bun "$T/editora-revisar.ts" "$@" ;;
   impacto)                    exec bun "$T/editora-impacto.ts" "$@" ;;
   versoes)                    exec bun "$T/editora-versoes.ts" "$@" ;;
+  personagem)                 exec bun "$T/editora-personagem.ts" "$@" ;;
   sensor)                     exec bun "$T/editora-sensor.ts" "$@" ;;
   grafo)                      exec bun "$T/editora-graph.ts" "$@" ;;
   doctor)                     exec bun "$T/editora-doctor.ts" "$@" ;;

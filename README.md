@@ -164,6 +164,10 @@ genérico de escrita.
 | `secoes-obrigatorias` | forma do artefato de planejamento | bloqueante |
 | `cobertura-upstream` | o artefato produzido referencia o que declarou consumir | bloqueante |
 | `metrica-capitulo` | palavras, frases, proporção de diálogo, maior frase | consultivo |
+| `regra-de-tres` | o refrão triádico: o mesmo n-grama em três segmentos da frase | consultivo |
+| `hedging` | densidade de atenuação — o texto que não se compromete | consultivo |
+| `final-de-capitulo` | o capítulo fecha em repouso em vez de virada | consultivo |
+| `variacao-elegante` | trocar de sinônimo por medo de repetir (exige declaração) | consultivo |
 
 Os quatro primeiros codificam os **quatro venenos** que o autor rejeitou em iterações
 seguidas; `abertura-cena` e `densidade` codificam as Leis nº 1 e nº 2 do `metodo-martin`.
@@ -178,6 +182,15 @@ bun core/tools/editora-sensor.ts rodar --id densidade --arquivo "cap-07.md"
 # todos os que o estágio declara
 bun core/tools/editora-sensor.ts estagio --estagio rascunho --unidade cap-07
 ```
+
+Os quatro últimos vieram do catálogo *Signs of AI writing* (Wikipédia), adaptado — não
+traduzido. A regra inglesa de cortar travessões ficou **de fora de propósito**: em
+português o travessão é a pontuação correta de diálogo, e adotá-la quebraria o texto.
+
+E o `variacao-elegante` **exige declaração** dos grupos de sinônimos nas convenções de
+prosa do livro. Saber que "espada" e "lâmina" nomeiam a mesma coisa é semântica, não
+padrão de texto — fingir que regex resolve produziria ruído, e sensor com falso positivo
+demais ensina você a ignorar o relatório.
 
 ### Calibração é obrigação, não luxo
 
@@ -274,7 +287,7 @@ core/
 └── tools/                        o motor
 harness/claude/                   skills e agentes do Claude Code (gerados)
 scripts/instalar.sh               liga tudo em ~/LIVROS/.claude
-tests/                            143 testes
+tests/                            155 testes
 ```
 
 Numa obra, o método grava em `<vault>/.editora/`:
@@ -314,7 +327,7 @@ verificação que nunca mais deixa passar.
 ## Desenvolvimento
 
 ```bash
-bun test                 # 143 testes
+bun test                 # 155 testes
 bun run compilar         # regenera stage-graph.json e scope-grid.json
 bun run checar           # falha se o compilado driftou do frontmatter
 bun run harness          # regenera os subagentes do Claude Code

@@ -1,6 +1,6 @@
 {
   "versao": "1",
-  "compilado_em": "2026-07-30T18:35:05Z",
+  "compilado_em": "2026-07-30T19:11:23Z",
   "estagios": [
     {
       "slug": "deteccao-projeto",
@@ -904,6 +904,9 @@
         "aforismo",
         "densidade",
         "repeticao",
+        "regra-de-tres",
+        "hedging",
+        "final-de-capitulo",
         "metrica-capitulo"
       ],
       "revisor": "editora-linha-agent",
@@ -954,6 +957,9 @@
         "aforismo",
         "densidade",
         "repeticao",
+        "regra-de-tres",
+        "hedging",
+        "variacao-elegante",
         "metrica-capitulo"
       ],
       "entradas": "O capítulo rascunhado e as convenções de prosa",
@@ -1202,7 +1208,11 @@
         "translates",
         "aforismo",
         "densidade",
-        "repeticao"
+        "repeticao",
+        "regra-de-tres",
+        "hedging",
+        "variacao-elegante",
+        "final-de-capitulo"
       ],
       "entradas": "O manuscrito completo, as convenções de prosa e a frase-exemplar",
       "saidas": "relatorio-de-voz.md e o manuscrito uniformizado",

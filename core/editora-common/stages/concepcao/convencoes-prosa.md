@@ -59,7 +59,25 @@ Do trecho-régua, extraia o que é replicável: tamanho médio de frase, uso de 
 
 Liste os tiques banidos, as construções vetadas e as aberturas proibidas. Inclua sempre os quatro venenos do autor: translatês, aforismo de para-choque, registro oral/baixo e prosa densa demais. Nomeie os sensores que medem cada um.
 
-### Passo 5 — Frase-exemplar
+### Passo 5 — Grupos de sinônimos
+
+Liste os conjuntos de palavras que nomeiam **a mesma coisa** neste livro, sob o título
+`## Grupos de sinônimos`:
+
+```markdown
+## Grupos de sinônimos
+
+- espada, lâmina, aço
+- Igreja, a Ordem, os irmãos
+```
+
+É o que alimenta o sensor `variacao-elegante` — sem a declaração ele não roda, porque
+saber que duas palavras nomeiam o mesmo objeto é semântica e não padrão de texto.
+
+Declare só os que importam: aquilo que o livro menciona o tempo todo e que o autor
+tende a fantasiar por medo de repetir.
+
+### Passo 6 — Frase-exemplar
 
 Copie de 3 a 6 frases do manuscrito aprovado para `frase-exemplar.md`. É contra estas frases que o prosista vai calibrar, não contra a descrição.
 

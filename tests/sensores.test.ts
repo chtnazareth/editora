@@ -1,6 +1,10 @@
 import { describe, expect, test } from "bun:test";
 import {
   extrairProsa,
+  sensorFinalDeCapitulo,
+  sensorHedging,
+  sensorRegraDeTres,
+  sensorVariacaoElegante,
   mascararFrontmatter,
   sensorAberturaCena,
   sensorAforismo,
@@ -236,5 +240,99 @@ describe("cobertura upstream", () => {
 
   test("sem consome declarado, passa", () => {
     expect(sensorCoberturaUpstream(ctx("Texto.")).passou).toBe(true);
+  });
+});
+
+describe("regra de três", () => {
+  test("acusa o refrão triádico", () => {
+    const r = sensorRegraDeTres(
+      ctx("Foram vinte anos de espera, vinte anos de silêncio, vinte anos de nada."),
+    );
+    expect(regras(r)).toContain("refrao-triadico");
+  });
+
+  test("NÃO acusa enumeração comum de três itens", () => {
+    // "Levou pão, queijo e vinho" é lista, não refrão. Acusar isso seria o
+    // tipo de falso positivo que ensina o autor a ignorar o relatório.
+    const r = sensorRegraDeTres(ctx("Levou pão, queijo e vinho para a estrada."));
+    expect(r.achados).toEqual([]);
+  });
+
+  test("NÃO acusa três segmentos com aberturas diferentes", () => {
+    const r = sensorRegraDeTres(
+      ctx("Ele parou na porta, olhou para dentro, e não entrou naquela noite."),
+    );
+    expect(r.achados).toEqual([]);
+  });
+});
+
+describe("hedging", () => {
+  test("acusa por densidade", () => {
+    const t = Array(6)
+      .fill("Talvez ele soubesse, e de certa forma parecia que sim.")
+      .join(" ");
+    expect(regras(sensorHedging(ctx(t)))).toContain("hedging");
+  });
+
+  test('NÃO acusa "parecia" isolado — em POV limitado é obrigatório', () => {
+    const t = `Parecia que a porta estava aberta. ${Array(60).fill("Ele andou até o fim do corredor de pedra.").join(" ")}`;
+    expect(sensorHedging(ctx(t)).passou).toBe(true);
+  });
+});
+
+describe("final de capítulo", () => {
+  test("acusa fechamento em repouso", () => {
+    const r = sensorFinalDeCapitulo(
+      ctx("Ele saiu correndo pela porta.\n\nA noite estava fria e silenciosa."),
+    );
+    expect(regras(r)).toContain("final-em-repouso");
+  });
+
+  test("NÃO acusa capítulo que fecha em diálogo", () => {
+    const r = sensorFinalDeCapitulo(ctx("Ele parou.\n\n— Então era você."));
+    expect(r.passou).toBe(true);
+    expect(r.metricas.fecha_em).toBe("diálogo");
+  });
+
+  test("NÃO acusa fechamento em ação", () => {
+    const r = sensorFinalDeCapitulo(ctx("Ele hesitou.\n\nEla fechou a porta e girou a chave."));
+    expect(r.passou).toBe(true);
+  });
+});
+
+describe("variação elegante", () => {
+  test("sem grupos declarados, passa com aviso — semântica não é regex", () => {
+    const r = sensorVariacaoElegante(ctx("A espada, a lâmina, o aço."));
+    expect(r.passou).toBe(true);
+    expect(regras(r)).toContain("sem-grupos");
+  });
+
+  test("com grupos declarados, acusa o ciclo de sinônimos", () => {
+    const r = sensorVariacaoElegante(
+      ctx("Ele ergueu a espada. A lâmina brilhou na luz. O aço pesava na mão.", {
+        grupos_sinonimos: [["espada", "lâmina", "aço"]],
+      }),
+    );
+    expect(regras(r)).toContain("variacao-elegante");
+  });
+
+  test("dois nomes só não é ciclo", () => {
+    const r = sensorVariacaoElegante(
+      ctx("Ele ergueu a espada. A lâmina brilhou.", {
+        grupos_sinonimos: [["espada", "lâmina", "aço"]],
+      }),
+    );
+    expect(r.passou).toBe(true);
+  });
+});
+
+describe("índices com diálogo presente", () => {
+  test("a linha reportada é a do arquivo, não a do texto sem falas", () => {
+    // Antes de separarNarracao preservar o comprimento, toda ocorrência depois
+    // de uma fala saía com o número de linha errado.
+    const t = "— Uma fala bem comprida aqui para deslocar tudo — disse ela.\n\nEle balançou a sua cabeça.";
+    const r = sensorTranslates(ctx(t));
+    const possessivo = r.achados.find((a) => a.regra === "possessivo-redundante")!;
+    expect(possessivo.linha).toBe(3);
   });
 });

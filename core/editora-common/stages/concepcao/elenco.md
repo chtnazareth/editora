@@ -63,7 +63,28 @@ Ele acha que está certo, e o texto precisa deixar isso defensável. Escreva o a
 
 Como cada um fala: registro, tamanho de frase, o que evita nomear, o que repete quando está nervoso. **Teste do diálogo cego** — tape os nomes: dá para saber quem fala?
 
-### Passo 5 — Podar o elenco
+### Passo 5 — Entrevistar antes de fechar
+
+Para cada personagem com peso, **entreviste antes de dar a ficha por pronta**. É o teste
+mais barato que existe.
+
+```bash
+bun {{METODO}}/core/tools/editora-personagem.ts --nome <nome>
+```
+
+O comando reúne a ficha e as aparições na página. A entrevista é sua: assuma a pessoa,
+responda em primeira pessoa e no registro dela, usando só o que a ficha e o canon
+estabelecem. Diante de uma situação que o livro ainda não mostrou, a pergunta que decide
+tudo é **"o que você faria agora?"**.
+
+- **Respondeu com firmeza** → a ficha aguenta.
+- **Hesitou** → falta alguma coisa. Volte à ficha antes de escrever qualquer cena com ele.
+- **Contradisse a ficha** → o achado mais valioso. Ou a ficha está errada, ou o
+  personagem é mais interessante do que ela dizia. Leve ao autor.
+
+Método completo em `core/knowledge/editora-personagens-agent/entrevistar-o-personagem.md`.
+
+### Passo 6 — Podar o elenco
 
 Dois personagens que cumprem a mesma função viram um. Promova a ficha própria só quem ganhou peso; o resto fica em `elenco-de-apoio.md`.
 

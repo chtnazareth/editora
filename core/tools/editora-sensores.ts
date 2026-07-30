@@ -29,6 +29,13 @@ export interface Contexto {
   consome?: string[];
   /** Meta de palavras do capítulo, se declarada. */
   alvo_palavras?: number;
+  /**
+   * Grupos de sinônimos declarados nas convenções de prosa do livro
+   * (`espada / lâmina / aço são a mesma coisa`). Sem eles, `variacao-elegante`
+   * não roda: saber que duas palavras nomeiam o mesmo objeto é semântica, e
+   * fingir que regex resolve isso produziria ruído.
+   */
+  grupos_sinonimos?: string[][];
 }
 
 export interface Resultado {
@@ -119,13 +126,19 @@ export function ehLinhaDeDialogo(linha: string): boolean {
   return /^\s*[—–-]\s+/.test(linha);
 }
 
-/** Separa narração de diálogo — vários sensores só valem sobre a narração. */
+/**
+ * Separa narração de diálogo — vários sensores só valem sobre a narração.
+ *
+ * Substitui por espaços em vez de apagar: os índices precisam continuar
+ * válidos contra o texto original, senão todo número de linha reportado sai
+ * errado assim que o capítulo tem uma fala. Foi um defeito silencioso.
+ */
 export function separarNarracao(texto: string): string {
   return texto
     .split(/\r?\n/)
-    .map((l) => (ehLinhaDeDialogo(l) ? "" : l))
+    .map((l) => (ehLinhaDeDialogo(l) ? " ".repeat(l.length) : l))
     .join("\n")
-    .replace(/[«"“][^»"”]{0,400}[»"”]/g, " ");
+    .replace(/[«"“][^»"”]{0,400}[»"”]/g, (m) => " ".repeat(m.length));
 }
 
 export function paragrafos(texto: string): { inicio: number; texto: string }[] {
@@ -775,6 +788,231 @@ export function sensorMetricaCapitulo(ctx: Contexto): Resultado {
   };
 }
 
+
+// ---------------------------------------------------------------------------
+// Regra de três — o refrão triádico
+// ---------------------------------------------------------------------------
+
+export function sensorRegraDeTres(ctx: Contexto): Resultado {
+  const texto = extrairProsa(ctx.texto);
+  const narracao = separarNarracao(texto);
+  const linhaDe = mapaLinhas(texto);
+  const achados: Achado[] = [];
+
+  for (const f of frases(narracao)) {
+    const segmentos = f.texto.split(/[,;]/).map((s) => s.trim()).filter((s) => s.length > 0);
+    if (segmentos.length < 3) continue;
+
+    // Bigramas de cada segmento. Não basta comparar o começo: o refrão real
+    // quase nunca abre a frase limpo — "Foram vinte anos de espera, vinte anos
+    // de silêncio, vinte anos de nada" traz um verbo antes do primeiro.
+    const porSegmento = segmentos.map((s) => {
+      const palavras = (s.match(/\p{L}+/gu) ?? []).map((w) => w.toLowerCase());
+      const bigramas = new Set<string>();
+      for (let i = 0; i + 1 < palavras.length; i++) {
+        const a = palavras[i];
+        const b = palavras[i + 1];
+        // Bigrama só conta se carregar alguma substância: "de um" repetido é
+        // gramática, não refrão.
+        const substancia = [a, b].some((w) => w.length >= 4 && !PARADAS.has(w));
+        if (substancia) bigramas.add(`${a} ${b}`);
+      }
+      return bigramas;
+    });
+
+    const contagem = new Map<string, number>();
+    for (const conjunto of porSegmento) {
+      for (const bg of conjunto) contagem.set(bg, (contagem.get(bg) ?? 0) + 1);
+    }
+    const refrao = [...contagem.entries()].find(([, n]) => n >= 3);
+    if (refrao) {
+      achados.push(
+        achado(
+          linhaDe,
+          f.inicio,
+          "refrao-triadico",
+          f.texto,
+          `"${refrao[0]}" repetido em três segmentos da mesma frase. Funciona uma vez por livro; em série vira maneirismo — e é uma das assinaturas mais fortes de texto gerado. Diga uma vez, com peso.`,
+        ),
+      );
+    }
+  }
+
+  return {
+    id: "regra-de-tres",
+    passou: achados.length <= 1,
+    achados,
+    metricas: { refroes: achados.length },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Hedging — o texto que não se compromete
+// ---------------------------------------------------------------------------
+
+const PADROES_HEDGING =
+  /(?<![\p{L}])(talvez|aparentemente|possivelmente|provavelmente|de certa forma|de certo modo|de alguma maneira|quase como se|como se fosse|parecia que|parecia ser|de algum jeito|em certa medida)(?![\p{L}])/giu;
+
+export function sensorHedging(ctx: Contexto): Resultado {
+  const texto = extrairProsa(ctx.texto);
+  const narracao = separarNarracao(texto);
+  const linhaDe = mapaLinhas(texto);
+  const achados: Achado[] = [];
+
+  const ocorrencias = [...narracao.matchAll(PADROES_HEDGING)];
+  const palavras = contarPalavras(narracao);
+  const densidade = palavras > 0 ? (ocorrencias.length / palavras) * 1000 : 0;
+
+  // Ocorrência isolada é legítima — em POV limitado, `parecia` é obrigatório:
+  // o POV não sabe. O que denuncia é o acúmulo.
+  if (densidade > 3 && ocorrencias.length >= 4) {
+    for (const m of ocorrencias.slice(0, 8)) {
+      achados.push(
+        achado(
+          linhaDe,
+          m.index ?? 0,
+          "hedging",
+          m[0],
+          `${ocorrencias.length} atenuações em ${palavras} palavras (${densidade.toFixed(1)}/mil). Cada uma é legítima; a densidade é que faz o texto parecer que não se compromete.`,
+        ),
+      );
+    }
+  }
+
+  return {
+    id: "hedging",
+    passou: achados.length === 0,
+    achados,
+    metricas: {
+      ocorrencias: ocorrencias.length,
+      por_mil_palavras: Number(densidade.toFixed(1)),
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Final de capítulo — fecha em virada, nunca em repouso
+// ---------------------------------------------------------------------------
+
+const VERBOS_ESTATIVOS = /(?<![\p{L}])(era|eram|estava|estavam|havia|ficava|ficavam|permanecia|continuava|parecia)(?![\p{L}])/iu;
+
+export function sensorFinalDeCapitulo(ctx: Contexto): Resultado {
+  const texto = extrairProsa(ctx.texto);
+  const linhaDe = mapaLinhas(texto);
+  const paras = paragrafos(texto).filter((p) => p.texto.trim().length > 0);
+
+  if (paras.length === 0) {
+    return { id: "final-de-capitulo", passou: true, achados: [], metricas: { final: "vazio" } };
+  }
+
+  const ultimo = paras[paras.length - 1];
+  const t = ultimo.texto.trim();
+
+  // Fechar em fala é fechar em virada — o melhor caso.
+  if (ehLinhaDeDialogo(t)) {
+    return {
+      id: "final-de-capitulo",
+      passou: true,
+      achados: [],
+      metricas: { fecha_em: "diálogo" },
+    };
+  }
+
+  const fs = frases(t);
+  const ultimaFrase = fs.length > 0 ? fs[fs.length - 1].texto : t;
+  const estativa = VERBOS_ESTATIVOS.test(ultimaFrase);
+  const temAcao = /(?<![\p{L}])\p{L}+(ou|eu|iu)(?![\p{L}])/u.test(ultimaFrase);
+
+  const achados: Achado[] = [];
+  if (estativa && !temAcao) {
+    achados.push(
+      achado(
+        linhaDe,
+        ultimo.inicio,
+        "final-em-repouso",
+        ultimaFrase,
+        "o capítulo fecha numa frase de estado, não numa virada. Capítulo termina em virada, revelação ou ameaça — nunca em repouso. Leia as últimas linhas dos capítulos em sequência: se mais de três forem descrição, o livro perdeu o metrônomo.",
+      ),
+    );
+  }
+
+  return {
+    id: "final-de-capitulo",
+    passou: achados.length === 0,
+    achados,
+    metricas: {
+      fecha_em: estativa && !temAcao ? "repouso" : "ação ou virada",
+      ultima_frase: ultimaFrase.slice(0, 60),
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Variação elegante — trocar de sinônimo por medo de repetir
+// ---------------------------------------------------------------------------
+
+export function sensorVariacaoElegante(ctx: Contexto): Resultado {
+  const grupos = ctx.grupos_sinonimos ?? [];
+  if (grupos.length === 0) {
+    return {
+      id: "variacao-elegante",
+      passou: true,
+      achados: [
+        {
+          linha: 1,
+          regra: "sem-grupos",
+          trecho: "",
+          mensagem:
+            "nenhum grupo de sinônimos declarado nas convenções de prosa. Declare os que importam (`espada / lâmina / aço`) para este sensor ter contra o que medir — semântica não se detecta por padrão de texto.",
+          severidade: "consultivo",
+        },
+      ],
+      metricas: { grupos: 0 },
+    };
+  }
+
+  const texto = extrairProsa(ctx.texto);
+  const linhaDe = mapaLinhas(texto);
+  const achados: Achado[] = [];
+  const JANELA = 600;
+
+  for (const grupo of grupos) {
+    const usos: { termo: string; idx: number }[] = [];
+    for (const termo of grupo) {
+      const re = new RegExp(
+        `(?<![\\p{L}])${termo.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(?![\\p{L}])`,
+        "giu",
+      );
+      for (const m of texto.matchAll(re)) usos.push({ termo, idx: m.index ?? 0 });
+    }
+    usos.sort((a, b) => a.idx - b.idx);
+
+    for (let i = 0; i + 1 < usos.length; i++) {
+      const janela = usos.filter((u) => u.idx >= usos[i].idx && u.idx - usos[i].idx <= JANELA);
+      const distintos = new Set(janela.map((u) => u.termo.toLowerCase()));
+      if (distintos.size >= 3) {
+        achados.push(
+          achado(
+            linhaDe,
+            usos[i].idx,
+            "variacao-elegante",
+            [...distintos].join(" → "),
+            `${distintos.size} nomes para a mesma coisa em ${JANELA} caracteres. Repetir o nome da coisa é mais honesto que buscar sinônimo — se a repetição incomoda, corte a segunda menção em vez de fantasiá-la.`,
+          ),
+        );
+        i += janela.length;
+      }
+    }
+  }
+
+  return {
+    id: "variacao-elegante",
+    passou: achados.length === 0,
+    achados,
+    metricas: { grupos: grupos.length, ocorrencias: achados.length },
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Registro
 // ---------------------------------------------------------------------------
@@ -790,4 +1028,8 @@ export const ANALISADORES: Record<string, (ctx: Contexto) => Resultado> = {
   "secoes-obrigatorias": sensorSecoesObrigatorias,
   "cobertura-upstream": sensorCoberturaUpstream,
   "metrica-capitulo": sensorMetricaCapitulo,
+  "regra-de-tres": sensorRegraDeTres,
+  hedging: sensorHedging,
+  "final-de-capitulo": sensorFinalDeCapitulo,
+  "variacao-elegante": sensorVariacaoElegante,
 };

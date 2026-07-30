@@ -80,7 +80,7 @@ sensor reprova a régua, o sensor está errado — não a régua.
 
 ## Testes
 
-`bun test` — 143 testes em 4 arquivos. Todo sensor tem caso positivo **e** negativo;
+`bun test` — 155 testes em 4 arquivos. Todo sensor tem caso positivo **e** negativo;
 o negativo é o que impede o falso positivo de voltar.
 
 Ao mexer num sensor, o teste de calibração é obrigatório: o caso que ele **não** pode

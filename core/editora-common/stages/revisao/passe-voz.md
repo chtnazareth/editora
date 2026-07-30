@@ -28,6 +28,10 @@ sensores:
   - aforismo
   - densidade
   - repeticao
+  - regra-de-tres
+  - hedging
+  - variacao-elegante
+  - final-de-capitulo
 entradas: O manuscrito completo, as convenções de prosa e a frase-exemplar
 saidas: relatorio-de-voz.md e o manuscrito uniformizado
 ---
